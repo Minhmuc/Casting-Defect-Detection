@@ -1,121 +1,174 @@
-# Đồ án Học sâu — CNN TensorFlow/Keras và ONNX
+# Phân loại lỗi sản phẩm đúc bằng CNN và học chuyển giao
 
-<!-- LOCAL-UPLOAD-START -->
-## Upload dữ liệu từ máy lên Colab
+**Nhóm 10 · Học phần Học sâu · ICTU**
 
-Trong [casting-cnn-tensorflow.ipynb](casting-cnn-tensorflow.ipynb) đã có một ô code **Upload dữ liệu từ máy tính lên Google Colab**, dùng `files.upload()`.
+Dự án nhận một ảnh mặt trước của sản phẩm đúc và phân loại ảnh thành **lỗi** hoặc **đạt yêu cầu**. Nhóm dùng CNN tự xây dựng làm mốc so sánh, sau đó thử hai mô hình **học chuyển giao** (*transfer learning*) là ResNet-18 và MobileNetV2. Kết quả chính thức nằm trong `casting_full_3models_01`. MobileNetV2 tại epoch 21 được chọn cho demo và dự đoán đúng **711/715 ảnh test**.
 
-1. Nén thư mục chứa `def_front/` và `ok_front/` thành một file ZIP.
-2. Mở bản notebook đã cập nhật trên Colab, chạy ô upload và bấm **Choose Files** để chọn ZIP.
-3. Chờ giải nén; nếu có nhiều bộ dữ liệu, chọn theo danh sách. Chạy tiếp các ô cấu hình/đọc dữ liệu, DATA_DIR được đặt tự động.
+| Tài liệu | Dùng khi cần |
+|---|---|
+| [Báo cáo Nhóm 10](bao_cao/baocao_DL_theo_dangbaocao.docx) | Xem phương pháp ở Chương 2 và kết quả ở Chương 3 |
+| [Câu hỏi và giải thích bảo vệ](CAU_HOI_VA_GIAI_THICH_BAO_VE.md) | Ôn cách đọc biểu đồ, giải thích spike và tập trả lời |
+| [Casting.ipynb](Casting.ipynb) | Xem mã, cấu hình và output của lượt chính thức |
+| [Hướng dẫn chạy Colab](HUONG_DAN_CASTING.md) và [hướng dẫn demo local](demo/README.md) | Làm theo các bước chi tiết trên máy của từng thành viên |
 
-Không cần mount Google Drive. Trên VS Code/local, bỏ qua ô upload. Đây chỉ là code được thêm vào; trợ lý không chạy upload, kiểm thử hoặc train.
+## 1. Định hướng của đề tài
 
-Nếu Colab đang mở bản từ GitHub, cần commit/push thay đổi hoặc upload trực tiếp bản notebook mới; sửa local không tự cập nhật tab Colab đang mở.
-<!-- LOCAL-UPLOAD-END -->
-
-Mở **[casting-cnn-tensorflow.ipynb](casting-cnn-tensorflow.ipynb)**. Đây là notebook mới để bạn tự thực hiện và giải thích bài, chưa có cell nào được chạy, chưa có trọng số hay kết quả TensorFlow. Không cần backend, thiết kế hệ thống hoặc giao diện web.
-
-Bản PyTorch và kết quả đã chạy trước đây được giữ trong `archive_pytorch/`, không dùng làm kết quả cho bản TensorFlow này. `data/raw/` giữ nguyên dữ liệu local để bạn sử dụng.
-
-## Mô hình dùng trong bài
+Nhóm muốn biết một CNN học từ đầu đạt kết quả ra sao trên bộ ảnh đúc, và việc dùng đặc trưng ảnh đã học trước có giúp phát hiện lỗi tốt hơn trong cùng điều kiện đánh giá hay không. Ba cấu hình dùng chung danh sách ảnh train, validation và test. Chúng khác nhau về kiến trúc, kích thước đầu vào và phần trọng số được học, nên kết quả phản ánh hiệu quả của từng cấu hình đầy đủ.
 
 ```text
-Ảnh xám 256 × 256, giá trị 0–255
-→ Rescaling(1/255)
-→ Conv2D + BatchNormalization + ReLU
-→ 3 khối SeparableConv2D + BatchNormalization + ReLU + MaxPooling2D
-→ GlobalAveragePooling2D
-→ Dense(64) + Dropout(0.3)
-→ Dense(1, sigmoid)
+Ảnh sản phẩm → Tiền xử lý → Mô hình → Điểm lớp đạt p_ok → Nhãn lỗi hoặc đạt
 ```
 
-Đây là CNN tự xây gọn, không dùng trọng số pretrained. So với bản Flatten/Dense ban đầu: SeparableConv2D tách tích chập theo kênh và trộn kênh để giảm tính toán; Batch Normalization chuẩn hóa đặc trưng trong quá trình train; Global Average Pooling giảm số tham số của phần phân loại. Những kỹ thuật này đã được dùng lâu, không phải kiến trúc mới năm 2026 và không bảo đảm chính xác hơn nếu chưa thực nghiệm.
+- **Nhãn 0, `def_front`** là sản phẩm lỗi.
+- **Nhãn 1, `ok_front`** là sản phẩm đạt.
+- `p_ok` từ **0,5** trở lên cho nhãn đạt. Dưới 0,5 cho nhãn lỗi. Giao diện hiển thị điểm lỗi bằng `1 - p_ok`.
 
-Giữ ảnh xám vì dữ liệu đang dùng không có thông tin màu cần khai thác. Chọn 256 thay vì 128 để giữ thêm chi tiết; đây là giả thuyết cần đánh giá, không phải kết luận 256 luôn tốt hơn. Kích thước được khai báo một nơi và dùng đồng bộ cho mô hình/ONNX.
+Đầu ra là nhãn cho **toàn ảnh**. Phạm vi này phù hợp với dữ liệu đang có, vốn gắn nhãn lỗi hoặc đạt cho mỗi ảnh. Định vị khuyết tật là bài toán cần dữ liệu và đánh giá theo vùng ảnh.
 
-## 1. Bạn tự chuẩn bị môi trường
+## 2. Dữ liệu và tiền xử lý
 
-**Cách đơn giản để dùng GPU: Google Colab.** Tải notebook, `requirements.txt` và dữ liệu lên Colab/Drive; chọn runtime GPU. Trong một ô riêng, tự chạy:
+Nhóm dùng phiên bản `casting_data` của bộ ảnh **Casting Product Image Data for Quality Inspection**. Phiên bản này có 7.348 ảnh kích thước 300 × 300, gồm 6.633 ảnh train nguồn và 715 ảnh test nguồn. [Nguồn dữ liệu Kaggle](https://www.kaggle.com/datasets/ravirajsinh45/real-life-industrial-dataset-of-casting-product)
 
-```python
-%pip install -r requirements.txt
+Nhóm đọc test trước để giữ tập kiểm thử do nguồn cung cấp. Khi tìm thấy **64 ảnh đạt trong train trùng pixel với test**, nhóm bỏ các bản sao phía train khỏi danh sách học. Cách kiểm tra dùng SHA-256 trên kích thước và pixel ảnh xám đã hiệu chỉnh hướng, trước khi đổi kích thước. Sau đó nhóm tách 15% từ 6.569 ảnh train còn lại để làm validation, chia theo tỷ lệ lớp với seed 42.
+
+| Tập | Lỗi | Đạt | Tổng | Vai trò |
+|---|---:|---:|---:|---|
+| Train | 3.194 | 2.389 | **5.583** | Học và cập nhật trọng số |
+| Validation | 564 | 422 | **986** | Theo dõi lượt học và chọn checkpoint |
+| Test | 453 | 262 | **715** | Đánh giá sau khi đã chọn checkpoint |
+
+Ảnh nguồn đã có các biến thể tăng cường dữ liệu. Pipeline của nhóm dùng các bước xác định như chuyển xám và resize, với `pipeline_augmentation=False`. Kiểm tra trùng pixel xử lý được bản sao chính xác. Các biến thể gần giống hoặc ảnh của cùng một sản phẩm vẫn là giới hạn vì bộ nguồn thiếu mã nhóm ảnh. [Danh sách ảnh bị loại](casting_full_3models_01/excluded_train_duplicates.csv) · [Thống kê chia tập](casting_full_3models_01/split_counts.csv)
+
+### Đầu vào của từng mô hình
+
+1. Đọc ảnh, hiệu chỉnh hướng, chuyển xám và resize bằng Pillow về **256 × 256 × 1**.
+2. CNN nhận đầu vào đó. Với hai backbone ImageNet, dùng TensorFlow để resize bilinear có antialias về **224 × 224**, rồi lặp kênh xám thành ba kênh. Ba kênh có cùng nội dung xám.
+3. Mỗi mô hình thực hiện bước chuẩn hóa của mình bên trong mạng.
+
+| Mô hình | Hình dạng đầu vào | Chuẩn hóa trong mạng |
+|---|---|---|
+| CNN | 256 × 256 × 1 | Chia giá trị pixel cho 255 |
+| ResNet-18 | 224 × 224 × 3 | `ResNetImageConverter` từ cùng preset ImageNet, có scale và offset riêng theo kênh |
+| MobileNetV2 | 224 × 224 × 3 | `x / 127,5 - 1`, đưa pixel từ khoảng 0–255 về khoảng −1 đến 1 |
+
+## 3. CNN tự xây dựng
+
+CNN học từ đầu. Nó học các **bộ lọc** quét qua những vùng nhỏ của ảnh để tạo ra các bản đồ đặc trưng. Một bản đồ đặc trưng ghi vị trí và mức độ mà bộ lọc phản ứng với mẫu hình nó đã học.
+
+```text
+Ảnh 256 × 256 × 1
+  → Conv2D 32 bộ lọc + ReLU → MaxPooling → 128 × 128 × 32
+  → Conv2D 64 bộ lọc + ReLU → MaxPooling → 64 × 64 × 64
+  → Conv2D 128 bộ lọc + ReLU → MaxPooling → 32 × 32 × 128
+  → Global Average Pooling → 128 giá trị
+  → Dense 64 + ReLU → Dropout 0,3 → Dense 1 + sigmoid → p_ok
 ```
 
-Nếu Colab yêu cầu restart runtime sau khi cài, restart rồi mới import TensorFlow. Cài thư viện không phải huấn luyện. Sửa `DATA_DIR` thành thư mục trực tiếp chứa `def_front/` và `ok_front/`; tải thư mục đầu ra về trước khi phiên Colab kết thúc.
+- **Conv2D** dùng bộ lọc 3 × 3. Padding `same` giữ chiều cao và chiều rộng sau tích chập. **ReLU** đưa giá trị âm về 0 và giữ giá trị dương để mạng học được các quan hệ phi tuyến.
+- **MaxPooling** lấy giá trị lớn nhất trong từng vùng 2 × 2, giảm chiều cao và chiều rộng còn một nửa sau mỗi khối.
+- **Global Average Pooling (GAP)** lấy trung bình trên mỗi bản đồ. Đầu ra có 128 số vì khối cuối có 128 bản đồ đặc trưng.
+- **Dense 64** kết hợp các đặc trưng. **Dropout 0,3** tạm đặt ngẫu nhiên một phần giá trị về 0 khi huấn luyện. **Dense 1 và sigmoid** tạo điểm lớp đạt từ 0 đến 1.
 
-**Trên Windows/VS Code:** dùng Python 3.11 hoặc 3.12, tạo môi trường riêng để không trộn với PyTorch cũ:
+CNN có **100.993 tham số được cập nhật**. Phần tìm đặc trưng ảnh và phần phân loại đều học từ ảnh đúc của nhóm. [Bảng cấu trúc CNN](casting_full_3models_01/model_summary_cnn.txt)
+
+## 4. Hai mô hình học chuyển giao và phần backbone được giữ lại
+
+**Backbone** là phần nhận ảnh và tạo bản đồ đặc trưng. **Đầu phân loại** dùng các đặc trưng đó để dự đoán nhãn. Trong học chuyển giao, nhóm lấy một backbone đã học trên ImageNet, giữ trọng số của nó cố định, rồi huấn luyện đầu phân loại cho hai lớp của bài toán ảnh đúc. [Học chuyển giao trong Keras](https://keras.io/guides/transfer_learning/)
+
+| Mô hình | Backbone giữ lại | Đặc trưng trước GAP | Đầu phân loại của nhóm |
+|---|---|---|---|
+| ResNet-18 | `ResNetBackbone.from_preset("resnet_18_imagenet", load_weights=True)` từ KerasHub | 7 × 7 × 512 | GAP → Dense 64 + ReLU → Dropout 0,3 → Dense 1 + sigmoid |
+| MobileNetV2 | `keras.applications.MobileNetV2(weights="imagenet", include_top=False, alpha=1.0)` | 7 × 7 × 1.280 | GAP → Dense 64 + ReLU → Dropout 0,3 → Dense 1 + sigmoid |
+
+Ở cả hai cấu hình, backbone chạy với `trainable=False` và được gọi với `training=False`. Backbone vẫn tính đặc trưng cho từng ảnh. Hai lớp Dense mới nhận cập nhật trọng số, còn các lớp học trước, kể cả thống kê Batch Normalization, giữ trạng thái suy luận. Đây là học chuyển giao với **backbone cố định**. Fine-tuning là bước mở khóa một phần backbone để học tiếp trên dữ liệu mới. [Hướng dẫn về đóng băng lớp và Batch Normalization](https://keras.io/guides/transfer_learning/)
+
+### ResNet-18 làm gì trong luồng ảnh?
+
+ResNet-18 dùng các khối có **đường nối tắt** (*skip connection*). Khi kích thước phù hợp, khối cộng đầu vào với phần biến đổi do các lớp bên trong tạo ra. Cách nối này giúp học các mạng sâu dễ hơn. Trong dự án, ảnh đi qua converter của preset rồi qua backbone ResNet-18 để lấy 512 bản đồ đặc trưng. GAP tóm tắt chúng thành 512 số cho đầu phân loại. [Bài báo ResNet](https://arxiv.org/abs/1512.03385) · [Bảng cấu trúc ResNet-18 của nhóm](casting_full_3models_01/model_summary_resnet18.txt)
+
+### MobileNetV2 làm gì trong luồng ảnh?
+
+MobileNetV2 dùng các khối mở rộng số kênh, lọc theo từng kênh bằng **depthwise convolution**, rồi nén về số kênh đầu ra. Đây là cách tổ chức được thiết kế để giảm chi phí tính toán. `include_top=False` lấy phần trích đặc trưng của mạng ImageNet. Sau chuẩn hóa, backbone tạo 1.280 bản đồ đặc trưng và GAP tóm tắt chúng thành 1.280 số. [Bài báo MobileNetV2](https://arxiv.org/abs/1801.04381) · [Bảng cấu trúc MobileNetV2 của nhóm](casting_full_3models_01/model_summary_mobilenetv2.txt)
+
+| Mô hình | Tổng tham số | Tham số được cập nhật |
+|---|---:|---:|
+| CNN | 100.993 | 100.993 |
+| ResNet-18 | 11.219.009 | 32.897 |
+| MobileNetV2 | 2.340.033 | 82.049 |
+
+MobileNetV2 có ít tham số tổng hơn ResNet-18, nhưng đầu Dense 64 của nó nhận 1.280 số thay vì 512 số, nên đầu phân loại có nhiều trọng số được học hơn. Thời gian huấn luyện còn gồm phần tính đặc trưng của backbone. Trên Tesla T4 trong lượt chính thức, thời gian fit xấp xỉ 300 giây với CNN, 991 giây với ResNet-18 và 557 giây với MobileNetV2. [Số tham số và thời gian fit](casting_full_3models_01/comparison.csv)
+
+## 5. Huấn luyện, đọc biểu đồ và chọn checkpoint
+
+Ba mô hình dùng **30 epoch**, **batch 32**, seed 42 và Adam với learning rate khởi đầu **0,001**. Một epoch là một lượt qua toàn bộ 5.583 ảnh train. Sau mỗi nhóm tối đa 32 ảnh, Adam điều chỉnh các trọng số được phép học. ReduceLROnPlateau giảm learning rate còn một nửa khi validation loss không cải thiện đủ trong 3 epoch, với mức sàn 0,000001. [Cấu hình trong notebook](Casting.ipynb)
+
+**Accuracy** đếm tỷ lệ ảnh đúng theo ngưỡng 0,5. **Loss** là điểm phạt dùng trong học, ở đây là binary cross-entropy. Ví dụ, với một ảnh lỗi, nếu mô hình cho điểm đạt 0,60 hoặc 0,99 thì cả hai lần đều sai một ảnh. Loss phạt nặng hơn ở lần mô hình gán điểm 0,99 cho nhãn sai. Vì vậy, accuracy có thể thay đổi ít trong khi loss tăng rõ.
+
+### Vì sao CNN lên chậm và vì sao biểu đồ có spike?
+
+Sau epoch đầu, validation accuracy của CNN là **57,20%**, ResNet-18 là **95,44%** và MobileNetV2 là **97,26%**. CNN phải học cả đặc trưng và đầu phân loại từ đầu. Hai backbone ImageNet đã tạo được đặc trưng cho ảnh, nên đầu phân loại mới có thể học nhanh hơn. Khi nhận xét quá khớp, cần xem cả train và validation qua nhiều epoch.
+
+Hãy hình dung mô hình làm lại cùng một đề sau mỗi lượt học. Trọng số vừa thay đổi có thể làm một số câu đang đúng thành sai. Nếu số sai tăng ở một lượt rồi giảm ở lượt tiếp theo, trên biểu đồ loss có thể xuất hiện một đỉnh ngắn.
+
+| Mô hình | Epoch trước → đỉnh → sau | Số ảnh validation sai trên 986 ảnh |
+|---|---|---|
+| CNN | 8 → 9 → 10 | 98 → **216** → 82 |
+| CNN | 17 → 18 → 19 | 67 → **281** → 57 |
+| ResNet-18 | 18 → 19 → 20 | 15 → **18** → 15 |
+| MobileNetV2 | 13 → 14 → 15 | 6 → **18** → 6 |
+
+Các số trên cho thấy mức tụt và mức phục hồi. Lịch sử loss và accuracy theo epoch chưa xác định nguyên nhân riêng của mỗi đỉnh. Dấu hiệu quá khớp cần nhìn trên nhiều lượt. Với MobileNetV2, từ epoch 21 đến 30, train loss giảm từ 0,0119 xuống 0,0046, trong khi validation loss kết thúc cao hơn, từ 0,0150 lên 0,0179. Kết quả gợi ý quá khớp nhẹ về cuối lượt. [Biểu đồ CNN](casting_full_3models_01/learning_curves_cnn.png) · [Biểu đồ ResNet-18](casting_full_3models_01/learning_curves_resnet18.png) · [Biểu đồ MobileNetV2](casting_full_3models_01/learning_curves_mobilenetv2.png)
+
+### Vì sao chạy 30 epoch mà demo dùng epoch 21?
+
+**Checkpoint** là bản lưu của mô hình tại một thời điểm trong quá trình huấn luyện. Nhóm chọn một checkpoint có validation loss nhỏ nhất cho từng mô hình. Sau đó, nhóm so sánh ba giá trị validation loss để chọn mô hình demo. Quyết định được lưu trong `selection.json` trước khi đánh giá trên 715 ảnh test. MobileNetV2 đạt validation loss thấp nhất ở **epoch 21**. [Kết quả lựa chọn](casting_full_3models_01/selection.json)
+
+## 6. Kết quả chính thức và cách đọc
+
+| Mô hình | Epoch chọn | Validation loss | Accuracy test | Ảnh đúng / 715 | Ảnh lỗi bị bỏ sót | Ảnh đạt bị báo lỗi |
+|---|---:|---:|---:|---:|---:|---:|
+| CNN | 29 | 0,121010 | 94,83% | 678 | 25 | 12 |
+| ResNet-18 | 29 | 0,026946 | 98,74% | 706 | 7 | 2 |
+| MobileNetV2 | **21** | **0,015027** | **99,44%** | **711** | **2** | **2** |
+
+Với MobileNetV2, trong 453 ảnh thật sự lỗi có 451 ảnh được phát hiện đúng, nên **recall lớp lỗi là 451/453**, khoảng 99,56%. Trong các ảnh bị báo lỗi, có 451 ảnh lỗi thật và 2 ảnh đạt bị báo nhầm, nên **precision lớp lỗi cũng là 451/453**. Accuracy lấy số đúng của cả hai lớp, gồm 451 ảnh lỗi và 260 ảnh đạt, chia cho 715.
+
+Khi bảo vệ, hãy đọc ma trận theo **hàng là nhãn thật, cột là nhãn dự đoán**. Ô hàng lỗi, cột đạt cho biết số sản phẩm lỗi bị cho qua. Hai ảnh lỗi MobileNetV2 bỏ sót gồm `cast_def_0_150.jpeg`, có điểm đạt khoảng 0,9556, và `cast_def_0_2102.jpeg`, có điểm đạt khoảng 0,5024. Một ảnh được dự đoán đạt với điểm cao, ảnh kia nằm sát ngưỡng 0,5. [Bảng kết quả đầy đủ](casting_full_3models_01/comparison.csv) · [Ma trận MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json) · [Danh sách ảnh sai](casting_full_3models_01/errors_mobilenetv2.csv)
+
+Các chỉ số trên mô tả một lần chạy với seed 42 và tập test cùng nguồn. Khả năng sử dụng với sản phẩm, camera hoặc ánh sáng khác cần được đánh giá trên dữ liệu tương ứng. Thời gian fit trên Colab đo cả lượt học và validation, còn tốc độ suy luận local là phép đo riêng.
+
+## 7. Xem hoặc chạy lại trên Google Colab
+
+Để đọc ngay, mở [notebook có output](Casting.ipynb) và xem các hình, bảng trong [thư mục kết quả chính thức](casting_full_3models_01/). Các tệp `history_*.csv` ghi loss và accuracy qua từng epoch. Cột `epoch` trong CSV bắt đầu từ 0, còn biểu đồ và báo cáo đếm từ 1.
+
+Để tái lập thực nghiệm:
+
+1. Nén phiên bản `data/casting_data` thành ZIP. Thư mục gốc dữ liệu trong ZIP cần chứa `train/def_front`, `train/ok_front`, `test/def_front` và `test/ok_front`.
+2. Upload `Casting.ipynb` lên Colab và chọn GPU nếu có. Chạy các ô chuẩn bị thư viện ở mục 1, khởi động lại session rồi chạy từ mục 2. Notebook thiết lập TensorFlow 2.20.0, Keras 3.12.0 và KerasHub 0.23.0 cho lượt này.
+3. Upload ZIP dữ liệu ở mục 3. Kiểm tra output mục 4 có 64 bản sao bị loại và ba số đếm 5.583 / 986 / 715.
+4. Chạy các mục 5–8 để chuẩn bị hàm và huấn luyện từng mô hình. Notebook lưu checkpoint `.keras`, lịch sử và gói sao lưu sau từng mô hình. Khi chạy thêm một lượt trong cùng thư mục kết quả, đặt `RUN_NAME` mới để ghi kết quả vào thư mục riêng.
+5. Chạy mục 9 để chọn mô hình và đánh giá test. Mục 10 tải gói kết quả huấn luyện. Các mục 11–13 chuẩn bị checkpoint demo, kiểm chứng khi nạp lại trên CPU, thử ảnh và tải `demo_bundle.zip` cùng gói `complete_*.zip`.
+
+[Hướng dẫn Colab theo từng mục](HUONG_DAN_CASTING.md)
+
+## 8. Chạy demo trên Windows
+
+Demo Streamlit nạp **MobileNetV2 epoch 21** và dự đoán trên CPU. Kiểm tra `demo/models/` có `casting_classifier.keras` và `metadata.json` của lượt chính thức. Với bản clone Git, lấy hai tệp từ gói `demo_bundle.zip` của lượt đó hoặc từ `casting_full_3models_01/demo/`, vì thư mục mô hình local được cấu hình bỏ qua khi theo dõi bằng Git.
+
+Mở PowerShell tại thư mục gốc dự án. Ví dụ dưới đây dùng Python 3.12.
 
 ```powershell
-cd D:\Casting-Defect-Detection-CNN
-py -3.12 -m venv .venv-tf
-.\.venv-tf\Scripts\python.exe -m pip install --upgrade pip
-.\.venv-tf\Scripts\python.exe -m pip install -r requirements.txt
+py -3.12 -m venv .venv-demo
+.\.venv-demo\Scripts\python.exe -m pip install -r demo\requirements.txt
+.\.venv-demo\Scripts\python.exe -m streamlit run demo\app.py
 ```
 
-Mở notebook, bấm **Select Kernel → Python Environments → .venv-tf**. Nếu không hiện, chọn đường dẫn `.venv-tf\Scripts\python.exe`. Không dùng kernel cũ chỉ vì nó đã cài TensorFlow phiên bản khác.
+Mở địa chỉ local do terminal hiển thị, chọn ảnh và nhấn **Phân loại ảnh**. Ảnh `demo/reference/cast_ok_0_45.jpeg` có kết quả tham chiếu trong notebook là **Đạt**, với điểm đạt hiển thị **99,82%**. Đây là điểm của một ảnh. Accuracy 99,44% là tỷ lệ đúng trên toàn bộ 715 ảnh test.
 
-TensorFlow từ 2.11 trở lên không hỗ trợ CUDA GPU trên Windows native. Với cách cài trên, việc danh sách GPU là `[]` không có nghĩa máy mất RTX 3060: notebook sẽ dùng CPU. Muốn train TensorFlow bằng GPU, dùng Colab hoặc Linux/WSL2 theo [hướng dẫn TensorFlow](https://www.tensorflow.org/install/pip). Chưa có phép đo thời gian chạy cho notebook mới.
+Notebook đã đối chiếu checkpoint sau khi nạp lại trên CPU với 10 ảnh validation. Nhãn trùng **10/10 ảnh**, sai lệch điểm dự đoán lớn nhất khoảng **4,21 × 10⁻⁸**. Giao diện Streamlit được kiểm tra tĩnh. Thành viên có thể dùng ảnh tham chiếu và tệp JSON tải từ giao diện để xác nhận trên máy của mình. [Kiểm chứng CPU](casting_full_3models_01/demo/verification.json) · [Ảnh minh họa từ notebook](demo/reference/demo_cast_ok_0_45.png) · [Hướng dẫn demo](demo/README.md)
 
-Các phiên bản TensorFlow/Keras/tf2onnx được ghi cố định để giảm thay đổi môi trường. Tổ hợp này được lựa chọn từ tài liệu, **chưa được cài hoặc kiểm thử trong phiên làm việc này**. Nếu gặp lỗi, giữ nguyên thông báo lỗi và các phiên bản được in ở mục 1 để cùng xử lý, không đổi thư viện hàng loạt.
+## 9. Chuẩn bị khi bảo vệ
 
-## 2. Trình tự bạn tự chạy và kiểm tra
+> Nhóm dùng CNN học từ đầu làm mốc và hai backbone ImageNet là ResNet-18, MobileNetV2 để học chuyển giao. Với hai backbone này, nhóm giữ cố định phần trích đặc trưng và huấn luyện đầu phân loại mới. Cả ba cấu hình dùng cùng cách chia train, validation và test. Nhóm chọn MobileNetV2 ở epoch 21 theo validation loss. Trên 715 ảnh test, mô hình đúng 711 ảnh, còn bỏ sót 2 ảnh lỗi và báo nhầm 2 ảnh đạt.
 
-Chưa dùng **Run All** khi chưa hiểu notebook. Chạy từng ô bằng Shift+Enter, đọc kết quả trước khi tiếp tục.
-
-| Mục trong notebook | Bạn làm gì | Cần quan sát |
-|---|---|---|
-| 1. Môi trường | Chạy ô import | Đúng Python/kernel, TensorFlow/Keras đúng phiên bản, GPU có hoặc không |
-| 2. Dữ liệu | Sửa DATA_DIR, đọc ảnh và kiểm tra | Hai lớp, số ảnh, ảnh hỏng/trùng, ảnh minh họa |
-| 3. Chia tập | Chạy chia train/validation/test | Không giao nhau; hai lớp có mặt ở cả ba tập |
-| 4. Tiền xử lý | Đọc hàm chuẩn bị batch | Kích thước 256 × 256 × 1, đầu vào 0–255, chưa chia 255 ngoài model |
-| 5. CNN | Chạy model.summary | Giải thích SeparableConv2D, BatchNorm, GAP, Dropout và sigmoid |
-| 6. Kiểm tra nhẹ | Chạy batch qua model ở chế độ suy luận | Shape đầu ra (batch, 1), xác suất hữu hạn trong [0,1]; chưa cập nhật trọng số |
-| 7. Không augmentation | Tự chạy cell model.fit đầu tiên | Train/validation loss và accuracy qua từng epoch |
-| 8. Có augmentation | Tự chạy cell model.fit thứ hai | Cùng split và cấu hình, chỉ khác augmentation |
-| 9. Chọn và đánh giá | Chọn bằng validation rồi mới xem test | Report, ma trận nhầm lẫn, đường cong và ảnh sai |
-| 10. Xuất ONNX | Tự chạy export | Có file ONNX và kiểm tra cấu trúc thành công |
-| 11. Kiểm chứng ONNX | Tự đối chiếu với Keras | Sai số xác suất trong ngưỡng, nhãn khớp |
-| 12. Một ảnh | Sửa IMAGE_PATH và chạy suy luận | Xác suất lớp lỗi/đạt được ánh xạ đúng |
-
-Mục 6 chỉ là kiểm tra dữ liệu và đầu ra, không chứng minh chất lượng. Mục 7 và 8 mới là những ô thực sự train. Mục 11 kiểm tra chuyển đổi mô hình, không thay thế đánh giá trên test.
-
-## 3. Huấn luyện 30 epoch và đối chứng
-
-Mặc định `EPOCHS = 30`, `USE_EARLY_STOPPING = False`: mỗi thí nghiệm chạy đủ 30 epoch nếu không bị gián đoạn. Vẫn lưu checkpoint có validation loss tốt nhất, không mặc định epoch cuối là tốt nhất. ReduceLROnPlateau giảm learning rate khi validation loss chững lại, không dừng huấn luyện.
-
-Nếu muốn dừng khi overfit, tự bật `USE_EARLY_STOPPING = True`; lúc đó có thể kết thúc trước 30 epoch. Chạy lâu hơn không tự bảo đảm chất lượng.
-
-Muốn thử quy trình ngắn trước, bạn có thể tự đặt `RUN_NAME = "thu_quy_trinh"`, `EPOCHS = 1` rồi chạy cả hai thí nghiệm. Kết quả này chỉ để kiểm tra luồng, không dùng làm kết quả chính. Sau đó restart kernel, đổi `RUN_NAME = "lan_01"`, đặt lại 30 epoch và làm thực nghiệm chính. Không cần bước thử một epoch nếu bạn muốn tự chạy chính thức ngay.
-
-Giữ cùng split, seed, batch size, kiến trúc và learning rate giữa hai cấu hình. Augmentation được áp dụng online trên train, không trên validation/test và không nằm trong mô hình export. Không coi ảnh augmentation là sản phẩm mới độc lập. Chỉ chọn mô hình bằng validation loss trước khi xem kết quả test.
-
-## 4. File bạn sẽ tạo ra
-
-Sau khi **bạn chạy**, file nằm trong `outputs_tensorflow/<RUN_NAME>/`:
-
-- `data_check.json`, `split.json`, `config.json`: dữ liệu và cấu hình lần chạy.
-- `cnn_no_aug.keras`, `cnn_with_aug.keras`, `history_*.csv`: checkpoint và lịch sử.
-- `selection.json`, `comparison.csv`, `classification_report.txt`, `test_predictions.csv`: lựa chọn và đánh giá.
-- `learning_curves.png`, `confusion_matrix.png`, `errors.png` nếu có ảnh sai.
-- `cnn_casting.onnx`, `metadata.json`: mô hình triển khai và ý nghĩa đầu vào/đầu ra.
-
-Notebook không ghi đè checkpoint đã có. Khi làm lại thí nghiệm, chọn `RUN_NAME` mới và restart kernel trước khi chạy lại từ đầu. Hai thí nghiệm phải thuộc cùng một lần chạy/cấu hình.
-
-## 5. Hiểu đúng sigmoid và ONNX
-
-Nhãn **0 = `def_front` (lỗi)**, **1 = `ok_front` (đạt)**. Sigmoid trả về `p_ok`; do đó `p_defect = 1 - p_ok`. Không ghi nhầm đầu ra sigmoid là xác suất lỗi.
-
-Input ONNX là float32 **NHWC** `[batch, 256, 256, 1]`, giá trị **0–255**, khác input NCHW của bản PyTorch cũ. Lớp Rescaling đã nằm trong model; chia 255 thêm lần nữa bên ngoài sẽ sai. Đầu ra là `[batch, 1]`, đã qua sigmoid, không thêm softmax.
-
-Cell xuất dùng [Keras Model.export(format="onnx")](https://keras.io/api/models/model_saving_apis/export/) với backend TensorFlow và tf2onnx. Cell kiểm chứng kế tiếp dùng cùng batch ảnh validation cho Keras/ONNX Runtime, so sánh xác suất và nhãn. Nếu assert không qua, dừng ở đó và xem lỗi trước khi làm demo. Cell này chưa được chạy.
-
-## 6. Nội dung bạn cần tự viết trong báo cáo
-
-Giải thích nguồn/gán nhãn dữ liệu, tỷ lệ lớp, cách chia tập, ảnh hỏng/trùng, vai trò từng lớp CNN, ảnh hưởng augmentation và dấu hiệu overfitting. Nhận xét recall lớp lỗi, không chỉ accuracy. Đưa ví dụ ảnh sai và giải thích có cơ sở, không bịa nguyên nhân.
-
-Một seed và tập test nhỏ chưa đủ kết luận mô hình tốt trong sản xuất. Hash chỉ phát hiện trùng pixel, chưa xử lý ảnh gần giống hoặc cùng lô. Chưa kiểm chứng camera, ảnh ngoài miền hoặc hiệu chuẩn xác suất. Đây là phân loại cả ảnh, không xác định vị trí vết lỗi.
-
-Nguồn dataset được ghi ở dự án tham khảo: [Casting Product Image Data trên Kaggle](https://www.kaggle.com/datasets/ravirajsinh45/real-life-industrial-dataset-of-casting-product). Cần kiểm tra điều kiện sử dụng và bổ sung URL repo gốc vào báo cáo. Dữ liệu local trước đây có 1.300 ảnh (781 lỗi, 519 đạt); bạn phải đọc lại thống kê khi chạy, không coi đó là kết quả đánh giá mới.
-
-Code TensorFlow mới được soạn với hỗ trợ AI. Tài liệu tham khảo: [SeparableConv2D](https://keras.io/api/layers/convolution_layers/separable_convolution2d/), [GlobalAveragePooling2D](https://keras.io/api/layers/pooling_layers/global_average_pooling2d/), [BatchNormalization](https://keras.io/api/layers/normalization_layers/batch_normalization/). Tuân theo quy định của giảng viên về sử dụng code tham khảo và AI.
+Mỗi thành viên nên tập giải thích được cách chia tập, đường đi của ảnh qua mô hình, sự khác nhau giữa loss và accuracy, và cách đọc số ảnh sai từ ma trận. Khi được hỏi vì sao loss có đỉnh, chỉ vào số ảnh sai ở lượt trước, tại đỉnh và lượt sau. Khi được hỏi kết quả có áp dụng ngoài nhà máy hay không, nêu rõ điều kiện của tập test và phạm vi phân loại toàn ảnh. [Câu hỏi và câu trả lời mẫu](CAU_HOI_VA_GIAI_THICH_BAO_VE.md)

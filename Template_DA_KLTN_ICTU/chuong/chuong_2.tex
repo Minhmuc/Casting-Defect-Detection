@@ -1,0 +1,109 @@
+\setcounter{chapter}{1}
+\setcounter{chapter}{1} 
+\setcounter{table}{0}
+\setcounter{figure}{0}
+%\addcontentsline{toc}{chapter}{KHẢO SÁT VÀ PHÂN TÍCH HỆ THỐNG}
+\chapter{KHẢO SÁT VÀ PHÂN TÍCH HỆ THỐNG}
+
+
+\section{Khảo sát hiện trạng}
+Sinh viên mô tả hiện trạng, quy trình nghiệp vụ hoặc bài toán thực tế liên quan đến đề tài.
+
+\section{Phân tích yêu cầu}
+Sinh viên trình bày yêu cầu chức năng, yêu cầu phi chức năng và các ràng buộc của hệ thống hoặc giải pháp.
+
+\section{Phương pháp thực hiện}
+Sinh viên mô tả phương pháp, quy trình, công cụ và dữ liệu sử dụng trong quá trình thực hiện đề tài.
+
+\section{Kế hoạch thực hiện}
+Sinh viên trình bày các giai đoạn công việc, mốc thời gian và sản phẩm dự kiến của từng giai đoạn.
+Ví dụ, kế hoạch thực hiện có thể được trình bày như Bảng~\ref{tab:ke-hoach}.
+
+\begin{table}[H]
+\centering
+\caption{Ví dụ bảng kế hoạch thực hiện}
+\label{tab:ke-hoach}
+\begin{tabular}{|c|p{5cm}|p{5cm}|}
+\hline
+\textbf{STT} & \textbf{Công việc} & \textbf{Kết quả dự kiến} \\
+\hline
+1 & Khảo sát và thu thập yêu cầu & Danh sách yêu cầu \\
+\hline
+2 & Phân tích và thiết kế & Tài liệu thiết kế \\
+\hline
+3 & Triển khai và kiểm thử & Sản phẩm và kết quả kiểm thử \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{figure}[htbp!]
+ \begin{center}
+\psfrag{z}{$\zeta$}
+\psfrag{x}{$\xi$}
+\psfrag{m}{$\xi_{\rm mid}$}
+\psfrag{p}{$\xi_{\rm mid}^+$}
+\psfrag{mm}{$\xi_{\rm mid}^-$}
+\psfrag{xp}{$\xi_+$}
+\psfrag{xm}{$\xi_-$}
+\psfrag{xps}{$\xi'_+$}
+\psfrag{xms}{$\xi'_-$}
+\includegraphics[width=5.5cm]{\figpath refine.eps} 
+\end{center}
+\caption{Các tâm được thêm vào tại lân cận cạnh được đánh dấu. 
+}
+\label{refine}
+\end{figure}
+ Thuật toán trong \cite{DavyOanh11} làm mịn cạnh $\zeta \xi$ bằng cách chèn thêm tâm mới $\xi _ { \rm {mid } }$ là trung điểm của cạnh này. Còn trong \cite{ODP2017}, ngoài trung điểm còn thêm các điểm $ \xi _ { \rm{ mid } } ^ { + } , \xi _ { \rm{ mid } } ^ { - }$ nằm trên đường trung của cạnh $\zeta \xi$ và đối xứng nhau qua $\xi _ { \rm{mid }}$. Tuy nhiên các điểm này có thể nằm ở vị trí rất gần điểm đã tồn tại hoặc một điểm mới được tạo ra khi làm mịn một cạnh khác. Để tránh điều này các thuật toán trong  \cite{DavyOanh11, ODP2017} chỉ làm mịn nếu 
+\begin{equation}\label{mu}
+\dist(\xi',\Xi')\ge\mu\sep_{\xi'}(\Xi'),\quad\text{với $\mu\in(0,1)$,}
+\end{equation}
+tức là, việc chèn một tâm mới $\xi'$ trong tập hiện tại $\Xi'$ không làm giảm  
+\emph{khoảng cách tách biệt địa phương} được xác định công thức
+\begin{equation}\label{sep}
+\sep_{\xi'}(\Xi'):=\frac{1}{4}\sum_{i=1}^4\dist(\xi_i,\Xi'\setminus\{\xi_i\}),
+\end{equation}
+trong đó $\xi_1,\ldots,\xi_4$ là bốn điểm gần nhất trong $\Xi'$  đến $\xi'$, và
+$\dist(x,Y):=\inf\{\|x-y\|:\,y\in Y\}$
+là khoảng cách từ điểm $x$ đến tập $Y$. 
+% Tuy nhiên, chúng tôi đã kiểm tra 
+% $\xi'\notin\partial\Omega$ không ở vị trí quá gần biên, 
+% xem các Bước II.2 và II.3.i của Thuật toán~\ref{alg2Refi}.  
+
+Nếu $\xi \in \partial \Xi$, thì tìm 2 điểm lân cận $\xi _ { - } , \xi _ { + } \in \partial \Xi$ và chèn thêm 2 trung điểm $\xi _ { - } ^ { \prime } , \xi _ { + } ^ { \prime }$ của các cạnh $\xi \xi _ { - }$ và $\xi \xi _ { + }$.
+
+
+
+% 
+
+\begin{algorithm}\label{alg1Refi}\rm {\bf Thuật toán làm mịn thích nghi  [Thuật toán 2, \cite{DavyOanh11}]} \\
+\emph{Input:} Bộ tâm $\Xi$ và các khuôn điểm $\{\Xi_\zeta:\,\zeta\in\Xi_{int}\}$. \\
+\emph{Output:} Bộ tâm được làm mịn $\Xi'$ và các giá stencil $\{ \Xi' _ { \zeta }: \zeta \in \Xi' \setminus \partial \Xi' \}$ . \\
+\emph{Các tham số:}   $\gamma = 0.5$, $\mu = 0.7$. 
+\begin{enumerate}[I.] 
+\item\label{1step1} Tính độ lệch lớn nhất  $\bar\eps=\bar\eps(\Xi)$ và đánh dấu tất cả các cạnh $\zeta\xi, \xi \in \Xi_{\zeta}\setminus \{\zeta\}, \zeta \in \Xi_{\rm int}$ sao cho $\eps(\zeta, \xi) \ge \gamma\bar\eps$. Thiết lập  $\Xi':=\Xi$.
+\item \label{1step2} \emph{Với mỗi} cạnh được đánh dấu $\zeta\xi$: 
+\begin{enumerate}[1.]
+\item Đặt $\xi':=(\zeta+\xi)/2$.
+\item \emph{Nếu} $\dist\left( \xi' , \Xi' \right) \ge \mu \sep _ { \xi' } \left( \Xi' \right)$:
+\begin{enumerate}[i.] 
+\item Thiết lập  $\Xi': = \Xi' \cup \{ \xi'\}$.
+\item \emph{Nếu} $\xi \in \partial \Xi$ thì thiết lập $\Xi': = \Xi' \cup \{ \xi' _ { - }, \xi' _ { + }\}$.
+\end{enumerate}
+\end{enumerate}
+\item 
+\begin{enumerate}[1.]
+\item \emph{Với mỗi} $\zeta \in \Xi' \setminus \partial \Xi'$:
+\begin{enumerate}[i.] 
+\item Áp dụng Thuật toán \ref{alg1} để tìm $\Xi' _ { \zeta } \subset \Xi'$. 
+\item Tính khoảng cách $d _ { \xi } = \| \zeta - \xi \| _ { 2 } , \xi \in \Xi' _ { \zeta } \setminus \{ \zeta \}$ và trung bình của chúng 
+$d _ { a v } : = \frac { 1 } { \ell } \sum _ { \xi \in \Xi' _ { \zeta } \setminus \{ \zeta \} } d _ { \xi }$, trong đó $\ell = \# \Xi' _ { \zeta } - 1$ và 
+đánh dấu tất cả các cạnh $\zeta \xi , \xi \in \Xi _ { \zeta } \setminus \{ \zeta \}$ sao cho $d _ { \xi } > 2 d _ { a v }$.
+\end{enumerate}
+\item Lặp lại Bước II đối với cạnh đã được đánh dấu trong Bước III.1 và tập tất cả các tâm mới đã được tạo trong tập $\Xi_{aux}$.
+\item Áp dụng Thuật toán \ref{alg1} để tìm $\Xi' _ { \zeta }$ với mọi $\zeta \in \Xi_{aux}$ và tính lại $\Xi' _ { \zeta }$ với $\zeta \in \Xi' \setminus \Xi _ { a u x }$ sao cho $\dist  \left( \zeta , \Xi _ { a u x } \right) < d \left( \Xi' _ { \zeta }\right): = \max _ { \xi \in \Xi'_ { \zeta } } \| \zeta - \xi \| _ { 2 }$. 
+\end{enumerate}
+\end{enumerate}
+\end{algorithm}
+%  

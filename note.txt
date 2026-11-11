@@ -1,0 +1,16 @@
+Góp ý báo cáo nhóm 10:
+Thêm ngày tháng năm
+Dữ liệu chuyển sang chương 2/3
+Lý thuyết mô hình chuyển về chương 2
+Bỏ 1.5, chuyển sang chương 3
+Gộp 2.2, 2.3 vào hết 1 mục thu thập và tiền xử lý dữ liệu
+Bỏ 2.6
+Lựa chọn mô hình cụ thể
+Đẩy 3.5 3.6 3.7 vào 1 mục nào đó
+Phần phân công nhiệm vụ, giữ lại đúng mẫu 2 bảng
+Chương 1: Cơ sở lý thuyết
+Chương 2: Phương pháp .... (viết sát với mô hình sử dụng)
+Sửa tên bảng cho chuẩn format: ví dụ Bảng 1.1: ABCXYZ
+Bổ sung hình ảnh, bảng vào chương 1; chương 2
+
+

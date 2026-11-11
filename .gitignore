@@ -9,6 +9,16 @@ outputs/
 outputs_tensorflow/
 archive_pytorch/
 .venv-tf/
+.venv-demo/
+demo/models/*
+!demo/models/.gitkeep
 Thumbs.db
 .DS_Store
 archive_pytorch/
+data/casting*
+casting_full*
+report_work
+reference/
+baocao.docx
+dangbaocao.docx
+Nhom 10_chinh_sua_theo_gop_y.docx

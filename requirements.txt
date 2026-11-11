@@ -1,13 +1,15 @@
-# Python 3.11 hoặc 3.12. Tạo môi trường mới cho bản TensorFlow.
-tensorflow==2.20.0
-keras==3.12.0
-tf2onnx==1.17.0
-numpy==1.26.4
-onnx==1.17.0
-onnxruntime>=1.20,<2
-pillow>=10,<12
+# Môi trường đầy đủ cho notebook và demo, Python 3.11–3.13 bản 64 bit.
+# TensorFlow, Keras, NumPy, Pillow và Streamlit dùng chung với demo local.
+-r demo/requirements.txt
+
+# Huấn luyện và đánh giá ba mô hình, đồng bộ với Casting.ipynb.
+keras-hub==0.23.0
+# KerasHub sử dụng TensorFlow Text trên Linux/Colab và macOS.
+tensorflow-text==2.20.1; platform_system != "Windows"
 matplotlib>=3.9,<4
-pandas>=2.2,<3
-scikit-learn>=1.5,<2
+pandas==2.2.3
+scikit-learn==1.6.1
+
+# Mở notebook trên máy.
 ipykernel>=6.29,<8
 jupyter>=1,<2

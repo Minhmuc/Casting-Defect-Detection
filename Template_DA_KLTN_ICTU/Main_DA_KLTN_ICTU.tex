@@ -1,0 +1,195 @@
+
+%%Mẫu ĐA/KLTN TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN VÀ TRUYỀN THÔNG (ICTU)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt,a4paper, reqno, oneside]{reportICTU}
+%\usepackage[13pt]{vnextsizes}
+\usepackage{amsmath,amsxtra,amssymb,latexsym, amscd,amsthm,multirow} %gói công thức toán
+\usepackage{enumerate} 
+\usepackage{graphicx,subfigure,psfrag} 
+\usepackage[top=2.0cm, bottom=2.0cm, left=3.0cm, right=2.0cm, headheight=15pt]{geometry} % căn lề
+\usepackage{indentfirst}
+\usepackage{color}
+\usepackage[utf8]{vietnam} % Tiếng Việt 
+ 
+\usepackage[mathscr]{eucal}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{setspace} % Bắt buộc phải có để sử dụng môi trường spacing
+%\usepackage{xhfill}
+%{\setstretch{1.2}
+
+\usepackage{fancybox} 
+\usepackage{boxedminipage}
+\usepackage{makecell}
+\newlength{\dll}
+\newenvironment{mdbox}
+{\setlength{\fboxsep}{10pt}\setlength{\shadowsize}{0pt}\setlength{\dll}{\linewidth}
+\addtolength{\dll}{-2\fboxsep}
+\addtolength{\dll}{-2\fboxrule}
+\begin{Sbox}\begin{minipage}{\dll}}
+{\end{minipage}\end{Sbox}
+\noindent\shadowbox{\TheSbox}}
+
+\usepackage[displaymath, mathlines]{lineno}%đánh số dòng
+
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\floatname{algorithm}{Thuật toán}
+\renewcommand{\algorithmicrequire}{\textbf{Đầu vào:}}
+\renewcommand{\algorithmicensure}{\textbf{Đầu ra:}}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+% \usepackage[subfigure]{tocloft}
+\usepackage{setspace}
+
+\usepackage{scrextend}
+\changefontsizes[16pt]{13pt} %font 13
+
+\usepackage{caption} % caption table and figure
+\captionsetup{margin=10pt,font=small}%,labelfont=bf}
+
+
+\usepackage{sansmathaccent}
+\pdfmapfile{+sansmathaccent.map}
+%\input setbmp
+\usepackage[unicode]{hyperref}
+\usepackage{titledot}
+\titlespacing{\chapter}{0pt}{-10pt}{0pt}[0pt]
+\titlename{Chương}
+%+ Can le van ban
+
+%%% Định nghĩa mỗi trường 
+%\newtheorem*{remarks}{Remarks}
+\newtheorem{lemma}{\bf Bổ đề}[section]
+\newtheorem{dl}{\bf Định lý}[section]
+\newtheorem{theorem}{\bf Định lý}[section]
+\newtheorem{proposition}{\bf Mệnh đề}[section]
+\newtheorem{corollary}{\bf Hệ quả}[section]
+\newtheorem{definition}{\bf Định nghĩa}[section]
+\newtheorem{remark}{\bf Chú ý}[section]
+\newtheorem{NX}{\bf Nhận xét}[section]
+\newtheorem{Bang}{\bf Bảng}[section]
+\newtheorem{vd}{\bf Ví dụ}[section]
+\newtheorem{example}{Ví dụ}[section]
+\newtheorem{Hi}[theorem]{\bf Hình}
+
+\newcommand{\pf}{\noindent{\bf Proof.} }
+\newcommand{\eop}{{ \vrule height7pt width7pt depth0pt}\par\bigskip}
+\newcommand{\meop}{\quad {\vrule height7pt width7pt depth0pt}}
+
+
+
+\def\figpath{Figures/} %thư mục chứa hình vẽ
+
+ 
+%% Định nghĩa một số ký hiệu toán học
+\def\RR{\mathbb{R}}
+\DeclareMathOperator{\sep}{sep}
+\DeclareMathOperator{\dist}{dist}
+\def\eps{\varepsilon}
+
+% \setlength{\oddsidemargin}{0in}
+% \setlength{\textwidth}{6.truein}
+% \setlength{\topmargin}{-0.5truein}
+% \setlength{\textheight}{9.3truein}
+%\renewcommand{\baselinestretch}{1.5}
+\usepackage{mathptmx}
+%+ Dinh nghia mot so ky hieu toan hoc.
+
+
+\newtheorem{prof}{}
+%+ Bat dau tai lieu tai day.
+ %\usepackage[usehighlevels]{alnumsec}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\rhead{}
+\chead{\thepage}
+\lhead{}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+%\newtheorem{algorithm}{Thuật toán}
+%\newtheorem{testproblem}{Test Problem}
+\newtheorem{testproblem}{Bài toán}
+
+
+
+\begin{document}
+
+
+% \alnumsecstyle{Raaa}
+% \surroundRoman{}{}
+% \surroundarabic[(][)]{.}{}
+
+%+ ==========================
+\newpage
+\input{bia/bia_chinh}
+
+\input{bia/bia_phu.tex}
+
+%+ Page style
+\setlength{\baselineskip}{22truept}
+\pagenumbering{roman}
+{
+%\newgeometry{top=3.0cm, bottom=2.0cm, left=3cm, right=2.0cm}
+\begin{spacing}{1.3}
+\input{chuong/loi_cam_doan} % LỜI CAM ĐOAN
+\newpage
+\input{chuong/loi_cam_on}  %{LỜI CẢM ƠN
+\newpage
+\input{chuong/tu_viet_tat} %DANH MỤC TỪ VIẾT TẮT
+
+\newpage
+\tableofcontents
+\newpage
+\addcontentsline{toc}{chapter}{Danh sách bảng}%section
+\listoftables
+\newpage
+\addcontentsline{toc}{chapter}{Danh sách hình vẽ}%section
+\listoffigures
+\end{spacing}
+%\newpage
+
+}
+
+%%% ==== NỘI DUNG CHÍNH
+\newpage
+\pagenumbering{arabic}
+{
+\input{chuong/phan_mo_dau} % PHẦN MỞ ĐẦU
+ \newpage
+ \input{chuong/chuong_1.tex}  % Nội dung chương 1
+ \input{chuong/chuong_2.tex} % Nội dung chương 2
+ \input{chuong/chuong_3.tex} % Nội dung chương 3
+ %\input{chuong/chuong_3.tex} % Nội dung chương 3
+ \newpage
+ \input{chuong/ket_luan.tex}
+
+}
+
+%+ Tai lieu tham khao
+ \newpage
+ \setlength{\baselineskip}{19truept}
+{
+
+\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}%section
+%%%%\printbibliography
+\bibliography{Tai_lieu_tham_khao/tai_lieu}
+\bibliographystyle{abbrv}%{plain}%%{siam}
+
+
+ \newpage
+ \input{chuong/nhan_xet_gvhd}
+}
+
+\end{document}

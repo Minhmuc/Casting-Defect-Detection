@@ -3,9 +3,6 @@
 -r demo/requirements.txt
 
 # Huấn luyện và đánh giá ba mô hình, đồng bộ với Casting.ipynb.
-keras-hub==0.23.0
-# KerasHub sử dụng TensorFlow Text trên Linux/Colab và macOS.
-tensorflow-text==2.20.1; platform_system != "Windows"
 matplotlib>=3.9,<4
 pandas==2.2.3
 scikit-learn==1.6.1

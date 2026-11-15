@@ -1,12 +1,13 @@
-# Phân loại lỗi sản phẩm đúc bằng CNN và học chuyển giao
+# Kiểm tra lỗi sản phẩm đúc bằng học sâu
 
 **Nhóm 10 · Học phần Học sâu · ICTU**
 
-Dự án nhận một ảnh mặt trước của sản phẩm đúc và phân loại ảnh thành **lỗi** hoặc **đạt yêu cầu**. Nhóm dùng CNN tự xây dựng làm mốc so sánh, sau đó thử hai mô hình **học chuyển giao** (*transfer learning*) là ResNet-18 và MobileNetV2. Kết quả chính thức nằm trong `casting_full_3models_01`. MobileNetV2 tại epoch 21 được chọn cho demo và dự đoán đúng **711/715 ảnh test**.
+Dự án nhận ảnh mặt trước của sản phẩm đúc và phân loại toàn ảnh thành **lỗi** hoặc **đạt yêu cầu**. Nhóm xây dựng CNN baseline rồi so sánh với ResNet-18 và MobileNetV2 sử dụng **học chuyển giao** (*transfer learning*). Kết quả chính thức nằm trong `casting_full_3models_01`. MobileNetV2 tại epoch 21 là mô hình đề xuất theo validation loss thấp nhất, dự đoán đúng **711/715 ảnh test**. Giao diện demo cho chọn và so sánh **cả ba mô hình**.
 
 | Tài liệu | Dùng khi cần |
 |---|---|
-| [Báo cáo Nhóm 10](bao_cao/baocao_DL_theo_dangbaocao.docx) | Xem phương pháp ở Chương 2 và kết quả ở Chương 3 |
+| [Bản báo cáo cô đọng](bao_cao/baocaocodong.docx) | Xem bản biên tập có phần tiền xử lý đã gộp, hình khối mạng, công thức và danh mục viết tắt |
+| [Báo cáo dùng để đối chiếu](bao_cao/baocao_DL_theo_dangbaocao.docx) | Đối chiếu nội dung với bản trước khi biên tập cô đọng |
 | [Câu hỏi và giải thích bảo vệ](CAU_HOI_VA_GIAI_THICH_BAO_VE.md) | Ôn cách đọc biểu đồ, giải thích spike và tập trả lời |
 | [Casting.ipynb](Casting.ipynb) | Xem mã, cấu hình và output của lượt chính thức |
 | [Hướng dẫn chạy Colab](HUONG_DAN_CASTING.md) và [hướng dẫn demo local](demo/README.md) | Làm theo các bước chi tiết trên máy của từng thành viên |
@@ -15,6 +16,8 @@ Dự án nhận một ảnh mặt trước của sản phẩm đúc và phân lo
 
 Nhóm muốn biết một CNN học từ đầu đạt kết quả ra sao trên bộ ảnh đúc, và việc dùng đặc trưng ảnh đã học trước có giúp phát hiện lỗi tốt hơn trong cùng điều kiện đánh giá hay không. Ba cấu hình dùng chung danh sách ảnh train, validation và test. Chúng khác nhau về kiến trúc, kích thước đầu vào và phần trọng số được học, nên kết quả phản ánh hiệu quả của từng cấu hình đầy đủ.
 
+**Cả ba mô hình đều thuộc họ CNN.** Cụm “CNN baseline” chỉ cấu hình Conv2D/MaxPooling do nhóm lựa chọn làm mốc. ResNet-18 và MobileNetV2 là hai kiến trúc CNN đã được công bố. Phần nhóm thực hiện gồm chọn cấu hình baseline, xử lý dữ liệu, tổ chức so sánh, huấn luyện đầu phân loại, đánh giá và làm demo.
+
 ```text
 Ảnh sản phẩm → Tiền xử lý → Mô hình → Điểm lớp đạt p_ok → Nhãn lỗi hoặc đạt
 ```
@@ -22,6 +25,10 @@ Nhóm muốn biết một CNN học từ đầu đạt kết quả ra sao trên 
 - **Nhãn 0, `def_front`** là sản phẩm lỗi.
 - **Nhãn 1, `ok_front`** là sản phẩm đạt.
 - `p_ok` từ **0,5** trở lên cho nhãn đạt. Dưới 0,5 cho nhãn lỗi. Giao diện hiển thị điểm lỗi bằng `1 - p_ok`.
+
+Ngưỡng **0,5** được chọn để so sánh hai điểm lớp. Khi `p_ok ≥ 0,5`, điểm đạt lớn hơn hoặc bằng điểm lỗi. Với giá trị nhỏ hơn 0,5, điểm lỗi lớn hơn. Trường hợp bằng nhau được chương trình gán đạt. Mô hình học cách tính `p_ok` từ dữ liệu, còn ngưỡng là quy tắc quyết định của chương trình. Nếu muốn ưu tiên tránh bỏ sót sản phẩm lỗi, có thể khảo sát ngưỡng bằng validation và đánh giá trên một tập kiểm thử được giữ riêng.
+
+`p_ok = 0,998192` là đầu ra sigmoid cho một ảnh. Việc đánh giá mức độ đáng tin của các điểm này cần phép hiệu chuẩn và dữ liệu tương ứng. Accuracy 99,44% là tỷ lệ dự đoán đúng trên 715 ảnh đã có nhãn.
 
 Đầu ra là nhãn cho **toàn ảnh**. Phạm vi này phù hợp với dữ liệu đang có, vốn gắn nhãn lỗi hoặc đạt cho mỗi ảnh. Định vị khuyết tật là bài toán cần dữ liệu và đánh giá theo vùng ảnh.
 
@@ -41,7 +48,7 @@ Nhóm đọc test trước để giữ tập kiểm thử do nguồn cung cấp.
 
 ### Đầu vào của từng mô hình
 
-1. Đọc ảnh, hiệu chỉnh hướng, chuyển xám và resize bằng Pillow về **256 × 256 × 1**.
+1. Đọc ảnh, hiệu chỉnh hướng EXIF, chuyển xám và resize bằng Pillow với nội suy bilinear về **256 × 256 × 1**.
 2. CNN nhận đầu vào đó. Với hai backbone ImageNet, dùng TensorFlow để resize bilinear có antialias về **224 × 224**, rồi lặp kênh xám thành ba kênh. Ba kênh có cùng nội dung xám.
 3. Mỗi mô hình thực hiện bước chuẩn hóa của mình bên trong mạng.
 
@@ -71,6 +78,19 @@ CNN học từ đầu. Nó học các **bộ lọc** quét qua những vùng nh�
 
 CNN có **100.993 tham số được cập nhật**. Phần tìm đặc trưng ảnh và phần phân loại đều học từ ảnh đúc của nhóm. [Bảng cấu trúc CNN](casting_full_3models_01/model_summary_cnn.txt)
 
+### “Tự xây dựng” được hiểu thế nào?
+
+Nhóm ghép các lớp Keras và lựa chọn số bộ lọc, số khối, cách giảm kích thước, đầu phân loại và cấu hình học. Các thành phần Conv2D, MaxPooling, GAP, Dense và Dropout là những thành phần phổ biến. CNN baseline được huấn luyện từ khởi tạo ngẫu nhiên trên tập ảnh đúc đã chia.
+
+Một tham số là một giá trị trọng số hoặc bias. Ví dụ, lớp Conv2D đầu có `(3 × 3 × 1 + 1) × 32 = 320` tham số. Số 1 trong ngoặc là bias của mỗi bộ lọc. Lớp Dense 64 nhận 128 giá trị từ GAP có `(128 + 1) × 64 = 8.256` tham số. Cộng các lớp có trọng số cho tổng **100.993**. Số tham số và kích thước đầu ra là hai thông tin riêng, có thể xem trong `model_summary_cnn.txt`.
+
+### Hai hàm kích hoạt cần hiểu
+
+- **ReLU** có công thức `max(0, z)`. Ví dụ minh họa, đầu vào −2 cho đầu ra 0, còn đầu vào 3 cho đầu ra 3. Trong baseline, ReLU nằm sau tích chập và tại Dense 64.
+- **Sigmoid** có công thức `1 / (1 + exp(-z))`, tạo điểm lớp đạt ở đầu ra. Khi `z = 0`, sigmoid bằng 0,5. Khi z tăng, điểm tiến gần 1, khi z giảm mạnh, điểm tiến gần 0.
+
+Chuẩn hóa, tích chập và các lớp tiếp theo tạo thành một chuỗi đã được học để chuyển ảnh thành điểm phân loại.
+
 ## 4. Hai mô hình học chuyển giao và phần backbone được giữ lại
 
 **Backbone** là phần nhận ảnh và tạo bản đồ đặc trưng. **Đầu phân loại** dùng các đặc trưng đó để dự đoán nhãn. Trong học chuyển giao, nhóm lấy một backbone đã học trên ImageNet, giữ trọng số của nó cố định, rồi huấn luyện đầu phân loại cho hai lớp của bài toán ảnh đúc. [Học chuyển giao trong Keras](https://keras.io/guides/transfer_learning/)
@@ -86,9 +106,33 @@ CNN có **100.993 tham số được cập nhật**. Phần tìm đặc trưng �
 
 ResNet-18 dùng các khối có **đường nối tắt** (*skip connection*). Khi kích thước phù hợp, khối cộng đầu vào với phần biến đổi do các lớp bên trong tạo ra. Cách nối này giúp học các mạng sâu dễ hơn. Trong dự án, ảnh đi qua converter của preset rồi qua backbone ResNet-18 để lấy 512 bản đồ đặc trưng. GAP tóm tắt chúng thành 512 số cho đầu phân loại. [Bài báo ResNet](https://arxiv.org/abs/1512.03385) · [Bảng cấu trúc ResNet-18 của nhóm](casting_full_3models_01/model_summary_resnet18.txt)
 
+Ví dụ một basic block cùng kích thước trong nhóm 64 kênh có luồng sau. BN là Batch Normalization.
+
+```text
+Nhánh biến đổi F(x)
+x → Conv 3×3, 64 → BN → ReLU → Conv 3×3, 64 → BN
+
+Nhánh tắt giữ nguyên x
+Đầu ra = ReLU(F(x) + x), kích thước 56 × 56 × 64
+```
+
+Hai lớp tích chập tạo phần biến đổi `F(x)`. Sau cộng và ReLU, đầu ra là `ReLU(F(x) + x)`. Khi khối đổi kích thước hoặc số kênh, nhánh tắt dùng phép chiếu để cộng được hai tensor. ResNet-18 đã học những trọng số này trong giai đoạn ImageNet. Trong lượt thực nghiệm của nhóm, chúng giữ cố định. [Triển khai basic block KerasHub 0.23.0](https://github.com/keras-team/keras-hub/blob/v0.23.0/keras_hub/src/models/resnet/resnet_backbone.py)
+
 ### MobileNetV2 làm gì trong luồng ảnh?
 
 MobileNetV2 dùng các khối mở rộng số kênh, lọc theo từng kênh bằng **depthwise convolution**, rồi nén về số kênh đầu ra. Đây là cách tổ chức được thiết kế để giảm chi phí tính toán. `include_top=False` lấy phần trích đặc trưng của mạng ImageNet. Sau chuẩn hóa, backbone tạo 1.280 bản đồ đặc trưng và GAP tóm tắt chúng thành 1.280 số. [Bài báo MobileNetV2](https://arxiv.org/abs/1801.04381) · [Bảng cấu trúc MobileNetV2 của nhóm](casting_full_3models_01/model_summary_mobilenetv2.txt)
+
+Ví dụ `block_7` trong mạng thực tế có đầu vào **14 × 14 × 64**, hệ số mở rộng 6 và stride 1.
+
+```text
+Conv 1×1 mở rộng 64 → 384 kênh → BN → ReLU6
+  → Depthwise 3×3 trên từng kênh → BN → ReLU6
+  → Conv 1×1 chiếu 384 → 64 kênh → BN
+  → Cộng với đầu vào x
+Đầu ra 14 × 14 × 64
+```
+
+ReLU6 giới hạn giá trị trong khoảng 0–6. Phép chiếu về 64 kênh giữ dạng tuyến tính trước khi cộng. Nhánh tắt được dùng khi stride bằng 1 và số kênh hai đầu bằng nhau. Khối đầu mạng dùng hệ số mở rộng 1, các khối tiếp theo sử dụng cấu hình mở rộng 6. [Triển khai MobileNetV2 Keras 3.12.0](https://github.com/keras-team/keras/blob/v3.12.0/keras/src/applications/mobilenet_v2.py)
 
 | Mô hình | Tổng tham số | Tham số được cập nhật |
 |---|---:|---:|
@@ -108,7 +152,7 @@ Ba mô hình dùng **30 epoch**, **batch 32**, seed 42 và Adam với learning r
 
 Sau epoch đầu, validation accuracy của CNN là **57,20%**, ResNet-18 là **95,44%** và MobileNetV2 là **97,26%**. CNN phải học cả đặc trưng và đầu phân loại từ đầu. Hai backbone ImageNet đã tạo được đặc trưng cho ảnh, nên đầu phân loại mới có thể học nhanh hơn. Khi nhận xét quá khớp, cần xem cả train và validation qua nhiều epoch.
 
-Hãy hình dung mô hình làm lại cùng một đề sau mỗi lượt học. Trọng số vừa thay đổi có thể làm một số câu đang đúng thành sai. Nếu số sai tăng ở một lượt rồi giảm ở lượt tiếp theo, trên biểu đồ loss có thể xuất hiện một đỉnh ngắn.
+Sau mỗi epoch, mô hình được đánh giá lại trên cùng **986 ảnh validation**. Trọng số vừa thay đổi có thể khiến một số ảnh đang được dự đoán đúng thành sai. Nếu chất lượng giảm ở một epoch rồi phục hồi ở epoch tiếp theo, đường loss xuất hiện một đỉnh ngắn.
 
 | Mô hình | Epoch trước → đỉnh → sau | Số ảnh validation sai trên 986 ảnh |
 |---|---|---|
@@ -119,9 +163,15 @@ Hãy hình dung mô hình làm lại cùng một đề sau mỗi lượt học. 
 
 Các số trên cho thấy mức tụt và mức phục hồi. Lịch sử loss và accuracy theo epoch chưa xác định nguyên nhân riêng của mỗi đỉnh. Dấu hiệu quá khớp cần nhìn trên nhiều lượt. Với MobileNetV2, từ epoch 21 đến 30, train loss giảm từ 0,0119 xuống 0,0046, trong khi validation loss kết thúc cao hơn, từ 0,0150 lên 0,0179. Kết quả gợi ý quá khớp nhẹ về cuối lượt. [Biểu đồ CNN](casting_full_3models_01/learning_curves_cnn.png) · [Biểu đồ ResNet-18](casting_full_3models_01/learning_curves_resnet18.png) · [Biểu đồ MobileNetV2](casting_full_3models_01/learning_curves_mobilenetv2.png)
 
+Đỉnh CNN ở epoch 18 đáng chú ý vì accuracy validation giảm từ **93,20% xuống 71,50%**, sau đó lên **94,22%** ở epoch 19. Số ảnh sai tại đỉnh là 281. Với ResNet-18 và MobileNetV2, số ảnh sai tăng ở các đỉnh được nêu nhỏ hơn nhiều. Khi trình bày, cần đọc đúng mức dao động của từng mạng.
+
+Hai cơ chế đánh giá cũng giúp hiểu vì sao validation có thể tốt hơn train. Chỉ số train được tích lũy qua các batch trong lúc trọng số liên tục thay đổi và Dropout hoạt động. Validation dùng trọng số cuối epoch và tắt Dropout. Chênh lệch giữa hai đường cần được đọc trong điều kiện đó.
+
+**Accuracy đạt 0,99 tự nó chưa đủ chẩn đoán quá khớp.** Cần xem khả năng cải thiện trên train, diễn biến validation và độ ổn định qua nhiều epoch. CNN có chất lượng thấp hơn hai cấu hình học trước, còn kết luận thiếu khớp cần thêm thực nghiệm về khả năng học và quá trình tối ưu.
+
 ### Vì sao chạy 30 epoch mà demo dùng epoch 21?
 
-**Checkpoint** là bản lưu của mô hình tại một thời điểm trong quá trình huấn luyện. Nhóm chọn một checkpoint có validation loss nhỏ nhất cho từng mô hình. Sau đó, nhóm so sánh ba giá trị validation loss để chọn mô hình demo. Quyết định được lưu trong `selection.json` trước khi đánh giá trên 715 ảnh test. MobileNetV2 đạt validation loss thấp nhất ở **epoch 21**. [Kết quả lựa chọn](casting_full_3models_01/selection.json)
+**Checkpoint** là bản lưu của mô hình tại một thời điểm trong quá trình huấn luyện. Nhóm chọn một checkpoint có validation loss nhỏ nhất cho từng mô hình. Sau đó, nhóm so sánh ba giá trị này để chọn mô hình đề xuất. Quyết định được lưu trong `selection.json` trước khi đánh giá trên 715 ảnh test. MobileNetV2 đạt validation loss thấp nhất ở **epoch 21**. Demo local hỗ trợ cả ba checkpoint đã chọn của từng mạng. [Kết quả lựa chọn](casting_full_3models_01/selection.json)
 
 ## 6. Kết quả chính thức và cách đọc
 
@@ -133,7 +183,24 @@ Các số trên cho thấy mức tụt và mức phục hồi. Lịch sử loss 
 
 Với MobileNetV2, trong 453 ảnh thật sự lỗi có 451 ảnh được phát hiện đúng, nên **recall lớp lỗi là 451/453**, khoảng 99,56%. Trong các ảnh bị báo lỗi, có 451 ảnh lỗi thật và 2 ảnh đạt bị báo nhầm, nên **precision lớp lỗi cũng là 451/453**. Accuracy lấy số đúng của cả hai lớp, gồm 451 ảnh lỗi và 260 ảnh đạt, chia cho 715.
 
-Khi bảo vệ, hãy đọc ma trận theo **hàng là nhãn thật, cột là nhãn dự đoán**. Ô hàng lỗi, cột đạt cho biết số sản phẩm lỗi bị cho qua. Hai ảnh lỗi MobileNetV2 bỏ sót gồm `cast_def_0_150.jpeg`, có điểm đạt khoảng 0,9556, và `cast_def_0_2102.jpeg`, có điểm đạt khoảng 0,5024. Một ảnh được dự đoán đạt với điểm cao, ảnh kia nằm sát ngưỡng 0,5. [Bảng kết quả đầy đủ](casting_full_3models_01/comparison.csv) · [Ma trận MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json) · [Danh sách ảnh sai](casting_full_3models_01/errors_mobilenetv2.csv)
+Ma trận được đọc theo **hàng là nhãn thật, cột là nhãn dự đoán**. Ô hàng lỗi, cột đạt cho biết số sản phẩm lỗi bị cho qua. Hai ảnh lỗi MobileNetV2 bỏ sót gồm `cast_def_0_150.jpeg`, có điểm đạt 0,955552, và `cast_def_0_2102.jpeg`, có điểm đạt 0,502379 sau làm tròn sáu chữ số. Một ảnh được dự đoán đạt với điểm cao, ảnh kia nằm sát ngưỡng 0,5. [Bảng kết quả đầy đủ](casting_full_3models_01/comparison.csv) · [Ma trận MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json) · [Danh sách ảnh sai](casting_full_3models_01/errors_mobilenetv2.csv)
+
+### TP, FN, FP, TN trong báo cáo
+
+Nhóm chọn **lớp lỗi là lớp quan tâm**, dù nhãn số của nó là 0. Cách đặt tên dương tính được xác định theo lớp đang đánh giá.
+
+| Ô trong ma trận | Ý nghĩa | MobileNetV2 |
+|---|---|---:|
+| TP, thật lỗi và dự đoán lỗi | Phát hiện đúng sản phẩm lỗi | 451 |
+| FN, thật lỗi và dự đoán đạt | Bỏ sót sản phẩm lỗi | 2 |
+| FP, thật đạt và dự đoán lỗi | Báo lỗi nhầm | 2 |
+| TN, thật đạt và dự đoán đạt | Nhận đúng sản phẩm đạt | 260 |
+
+`Precision = TP / (TP + FP)` trả lời trong số ảnh bị báo lỗi, có bao nhiêu ảnh lỗi thật. `Recall = TP / (TP + FN)` trả lời trong số ảnh lỗi thật, phát hiện được bao nhiêu. F1 kết hợp precision và recall bằng trung bình điều hòa. **Macro F1** là trung bình F1 của hai lớp, mỗi lớp có trọng số bằng nhau.
+
+### Phạm vi của kết luận so sánh
+
+Kết quả cho thấy hai cấu hình học chuyển giao đạt độ chính xác cao hơn baseline trên bộ kiểm thử này. Cả ba dùng cùng danh sách ảnh, số epoch và cách đánh giá. Khởi tạo ImageNet, độ phân giải và phần tham số được cập nhật khác nhau giữa các cấu hình. Muốn tách riêng tác động của từng yếu tố cần thiết kế thêm thực nghiệm đối chứng.
 
 Các chỉ số trên mô tả một lần chạy với seed 42 và tập test cùng nguồn. Khả năng sử dụng với sản phẩm, camera hoặc ánh sáng khác cần được đánh giá trên dữ liệu tương ứng. Thời gian fit trên Colab đo cả lượt học và validation, còn tốc độ suy luận local là phép đo riêng.
 
@@ -153,22 +220,90 @@ Các chỉ số trên mô tả một lần chạy với seed 42 và tập test c
 
 ## 8. Chạy demo trên Windows
 
-Demo Streamlit nạp **MobileNetV2 epoch 21** và dự đoán trên CPU. Kiểm tra `demo/models/` có `casting_classifier.keras` và `metadata.json` của lượt chính thức. Với bản clone Git, lấy hai tệp từ gói `demo_bundle.zip` của lượt đó hoặc từ `casting_full_3models_01/demo/`, vì thư mục mô hình local được cấu hình bỏ qua khi theo dõi bằng Git.
+Demo Streamlit cho chọn **CNN epoch 29, ResNet-18 epoch 29 và MobileNetV2 epoch 21**, chạy riêng hoặc so sánh trên cùng ảnh bằng CPU. Chuẩn bị các checkpoint và metadata trong `demo/models/` bằng `demo/prepare_models.py` từ bộ kết quả `casting_full_3models_01`. Thư mục trọng số được bỏ qua bởi Git, nên cần tải kèm khi chuyển máy. MobileNetV2 có validation loss thấp nhất trong thực nghiệm.
 
 Mở PowerShell tại thư mục gốc dự án. Ví dụ dưới đây dùng Python 3.12.
 
 ```powershell
 py -3.12 -m venv .venv-demo
 .\.venv-demo\Scripts\python.exe -m pip install -r demo\requirements.txt
+.\.venv-demo\Scripts\python.exe demo\prepare_models.py
 .\.venv-demo\Scripts\python.exe -m streamlit run demo\app.py
 ```
 
-Mở địa chỉ local do terminal hiển thị, chọn ảnh và nhấn **Phân loại ảnh**. Ảnh `demo/reference/cast_ok_0_45.jpeg` có kết quả tham chiếu trong notebook là **Đạt**, với điểm đạt hiển thị **99,82%**. Đây là điểm của một ảnh. Accuracy 99,44% là tỷ lệ đúng trên toàn bộ 715 ảnh test.
+Mở Local URL, chọn một hoặc cả ba mô hình rồi tải ảnh và nhấn **Phân loại tất cả**. Mỗi ảnh có bảng đối chiếu nhãn và điểm dự đoán của các mô hình đã chọn. Điểm hiển thị 6 chữ số thập phân. CSV/JSON chứa một bản ghi cho mỗi cặp ảnh–mô hình, nên 2 ảnh với 3 mô hình tạo 6 bản ghi. Với MobileNetV2, ảnh `demo/reference/cast_ok_0_45.jpeg` có điểm đạt **0.998192**. Đây là điểm của một ảnh, còn accuracy 99,44% được tính trên toàn bộ 715 ảnh test.
 
-Notebook đã đối chiếu checkpoint sau khi nạp lại trên CPU với 10 ảnh validation. Nhãn trùng **10/10 ảnh**, sai lệch điểm dự đoán lớn nhất khoảng **4,21 × 10⁻⁸**. Giao diện Streamlit được kiểm tra tĩnh. Thành viên có thể dùng ảnh tham chiếu và tệp JSON tải từ giao diện để xác nhận trên máy của mình. [Kiểm chứng CPU](casting_full_3models_01/demo/verification.json) · [Ảnh minh họa từ notebook](demo/reference/demo_cast_ok_0_45.png) · [Hướng dẫn demo](demo/README.md)
+Notebook đã đối chiếu MobileNetV2 sau nạp trên CPU với 10 ảnh validation, có nhãn trùng **10/10 ảnh** và sai lệch điểm lớn nhất khoảng **4,21 × 10⁻⁸**. Khi chuẩn bị demo đủ ba mô hình, mỗi checkpoint tiếp tục được đối chiếu trên 10 ảnh test, gồm 5 ảnh lỗi và 5 ảnh đạt.
+
+| Mô hình | Nhãn trùng dự đoán Colab | Sai lệch điểm lớn nhất |
+|---|---:|---:|
+| CNN | 10/10 | 8,2600 × 10⁻⁸ |
+| ResNet-18 | 10/10 | 3,1825 × 10⁻⁶ |
+| MobileNetV2 | 10/10 | 6,2771 × 10⁻⁷ |
+
+Nhãn trùng trong phép kiểm chứng có nghĩa đầu ra sau nạp khớp dự đoán tham chiếu. Tỷ lệ đúng so với nhãn thật được tính trên toàn bộ 715 ảnh test. Sai lệch số thực nhỏ giữa GPU và CPU được kiểm tra với dung sai tương đối 10⁻³ và tuyệt đối 10⁻⁴. [Kiểm chứng ban đầu](casting_full_3models_01/demo/verification.json) · [Kiểm chứng cả ba mô hình](demo/models/comparison_verification.json)
+
+Giao diện Streamlit đã được chạy trên Windows/CPU ngày 15/11/2026 với hai ảnh đạt/lỗi, tạo sáu kết quả và kiểm tra tải CSV/JSON, đổi lựa chọn, chạy riêng CNN và xử lý tệp ảnh hỏng. Thành viên có thể dùng ảnh tham chiếu để kiểm tra lại trên máy của mình. [Hướng dẫn demo](demo/README.md)
+
+### Lưu ý khi chuyển máy
+
+- Gói `complete_*.zip` chứa bộ kết quả và ba checkpoint. Gói `demo_bundle.zip` từ notebook chứa mô hình đề xuất. Để mở giao diện đủ ba mạng, dùng bộ kết quả chính thức với `demo/prepare_models.py` hoặc nhận đủ thư mục `demo/models/` đã chuẩn bị.
+- Giữ cùng chuỗi tiền xử lý từ ảnh nguồn đến tensor đầu vào. Metadata mô tả bước chuyển xám, resize 256, resize 224 đối với mạng học trước và quy tắc chuẩn hóa trong mô hình.
+- Trên Windows, `demo/inference.py` tái tạo converter ResNet-18 bằng các phép Keras theo cấu hình đã lưu, sau đó nạp trọng số checkpoint. Các kết quả đối chiếu ở trên là căn cứ kiểm tra cách nạp này.
+- Môi trường demo đã kiểm tra gồm Python 3.12.14, TensorFlow 2.20.0, Keras 3.12.0, KerasHub 0.23.0, NumPy 2.2.6, Pillow 11.3.0 và Streamlit 1.67.0. Tệp requirements quy định các gói cài đặt. [Thư viện demo](demo/requirements.txt)
+
+Ảnh dùng minh họa `cast_ok_0_45.jpeg` thuộc tập test. Khi trình bày, có thể mở hai ảnh tham chiếu đạt/lỗi, chọn cả ba mô hình, xem sáu kết quả rồi tải CSV hoặc JSON. Ảnh ngoài bộ dữ liệu có điều kiện chụp tương tự có thể dùng để khảo sát thêm, kèm thông tin về nhãn và nguồn ảnh.
 
 ## 9. Chuẩn bị khi bảo vệ
 
 > Nhóm dùng CNN học từ đầu làm mốc và hai backbone ImageNet là ResNet-18, MobileNetV2 để học chuyển giao. Với hai backbone này, nhóm giữ cố định phần trích đặc trưng và huấn luyện đầu phân loại mới. Cả ba cấu hình dùng cùng cách chia train, validation và test. Nhóm chọn MobileNetV2 ở epoch 21 theo validation loss. Trên 715 ảnh test, mô hình đúng 711 ảnh, còn bỏ sót 2 ảnh lỗi và báo nhầm 2 ảnh đạt.
 
 Mỗi thành viên nên tập giải thích được cách chia tập, đường đi của ảnh qua mô hình, sự khác nhau giữa loss và accuracy, và cách đọc số ảnh sai từ ma trận. Khi được hỏi vì sao loss có đỉnh, chỉ vào số ảnh sai ở lượt trước, tại đỉnh và lượt sau. Khi được hỏi kết quả có áp dụng ngoài nhà máy hay không, nêu rõ điều kiện của tập test và phạm vi phân loại toàn ảnh. [Câu hỏi và câu trả lời mẫu](CAU_HOI_VA_GIAI_THICH_BAO_VE.md)
+
+### Những câu cần trả lời được
+
+| Câu hỏi | Cách giải thích bám thực nghiệm |
+|---|---|
+| Vì sao dùng ba mô hình này? | CNN là mốc học từ đầu, ResNet-18 và MobileNetV2 đại diện hai cấu hình học chuyển giao có cách tổ chức khối và quy mô khác nhau. |
+| Bộ dữ liệu bao nhiêu ảnh thật sự được dùng? | 7.348 ảnh nguồn, loại 64 bản trùng chính xác phía train, còn 7.284 ảnh chia thành 5.583 train, 986 validation và 715 test. |
+| Loại trùng đã xử lý được những gì? | SHA-256 kiểm tra kích thước và pixel ảnh xám trước resize. Quan hệ giữa các biến thể xoay hoặc đổi sáng còn cần thông tin ảnh gốc để xác định. |
+| Vì sao dùng ảnh xám? | Ảnh nguồn mô tả bề mặt và cấu hình dùng thông tin cường độ sáng. Hai backbone nhận ba bản sao của cùng kênh xám để đáp ứng hình dạng đầu vào. |
+| Vì sao resize hai lần? | Biểu diễn chung dùng Pillow về 256, sau đó hai mạng học trước dùng TensorFlow về 224. Demo tái tạo đúng chuỗi mà mô hình đã nhận trong thực nghiệm. |
+| CNN tự xây có đóng góp gì? | Nhóm chọn và ghép cấu hình baseline, chuẩn bị dữ liệu, huấn luyện, đối chiếu, đánh giá và triển khai demo bằng các lớp CNN phổ biến. |
+| Backbone giữ lại những gì? | Giữ phần trích xuất và trọng số ImageNet. Hai lớp Dense mới được học, còn backbone và thống kê Batch Normalization giữ cố định. |
+| Vì sao accuracy lên nhanh với hai mạng học trước? | Chúng đã có bộ trích đặc trưng ImageNet, phần học mới tập trung vào đầu phân loại. |
+| Spike có chứng minh overfitting? | Cần đọc nhiều epoch. Báo cáo ghi nhận mức giảm và phục hồi ở từng mạng, đồng thời giữ nguyên mức chưa xác định của nguyên nhân cụ thể. |
+| Vì sao chọn MobileNetV2 epoch 21? | Đây là checkpoint có validation loss thấp nhất theo tiêu chí đã đặt và được lưu trước bước đánh giá test. |
+| Precision, recall lớp lỗi có ý nghĩa gì? | Precision xét các ảnh bị báo lỗi, recall xét các ảnh thực sự lỗi. Với MobileNetV2, cả hai bằng 451/453, khoảng 99,56%. |
+| Điểm đạt cao có bảo đảm đúng? | Có ảnh lỗi `cast_def_0_150.jpeg` nhận điểm đạt 0,955552. Điểm sigmoid cần được đọc cùng dự đoán sai và phạm vi kiểm chứng. |
+| Có áp dụng ngoài nhà máy ngay được? | Kết quả hiện có gắn với tập test cùng nguồn. Ảnh độc lập theo sản phẩm, camera và ánh sáng là dữ liệu cần bổ sung để đánh giá phạm vi sử dụng rộng hơn. |
+| Nhóm đã so sánh tốc độ chạy mỗi ảnh chưa? | Các thời gian 300,36 / 990,97 / 557,11 giây là thời gian huấn luyện và validation trên T4. Độ trễ dự đoán là phép đo cần tổ chức riêng. |
+
+### Đọc báo cáo và trình bày theo thứ tự
+
+1. Chương 2 giải thích bài toán, nhãn, dữ liệu, đầu vào, ba cấu hình và cách chọn checkpoint.
+2. Chương 3 bắt đầu từ số lượng ảnh thực dùng, trình bày kết quả huấn luyện, so sánh test và phân tích các ảnh sai.
+3. Khi nói về một mô hình, nêu phần được học, checkpoint sử dụng và kết quả trên test. Khi nói về spike, chỉ vào epoch cụ thể cùng số ảnh sai trước và sau.
+4. Mở demo đủ ba mạng trên cùng hai ảnh, đọc nhãn và điểm theo từng mạng, rồi xuất kết quả.
+
+## 10. Các tệp dùng đối chiếu và gói nộp
+
+| Tệp hoặc thư mục | Nội dung cần biết |
+|---|---|
+| `Casting.ipynb` | Mã và output của lượt thực nghiệm chính thức |
+| `casting_full_3models_01/config.json`, `split.json` | Cấu hình và danh sách ảnh của ba tập |
+| `history_*.csv`, `fit_*.json`, `selection.json` | Diễn biến huấn luyện, checkpoint và quyết định lựa chọn |
+| `architecture_*.json`, `model_summary_*.txt` | Cấu trúc mạng và số tham số |
+| `test_predictions_*.csv`, `metrics_*.json`, `errors_*.csv` | Dự đoán từng ảnh, chỉ số và ảnh sai |
+| `demo/app.py`, `inference.py`, `prepare_models.py`, `style.css` | Giao diện, nạp mạng, chuẩn bị checkpoint và cách trình bày |
+| `demo/models/` | Ba checkpoint `.keras`, metadata và kết quả kiểm chứng |
+| `.streamlit/config.toml` | Cấu hình giao diện khi chạy từ gốc dự án |
+| `casting_full_3models_01_decay/` | Dữ liệu của lượt thử nghiệm lịch tốc độ học khác, được lưu để tham khảo |
+
+Các bảng số liệu trong báo cáo và README lấy từ **`casting_full_3models_01`**. Model summary mô tả tầng, kích thước và tham số từ cấu hình mạng. Các hình đường học và ma trận sử dụng output đã lưu của cùng lượt.
+
+Mã nguồn nộp cho giảng viên được dẫn bằng liên kết trong phụ lục. Trước khi nộp, nhóm mở liên kết ở cửa sổ riêng tư để xác nhận quyền xem và kiểm tra gói có notebook, mã demo, requirements, cấu hình, ba checkpoint cùng metadata, kết quả chính thức và hướng dẫn chạy. Quyền truy cập và danh sách tệp trên Drive cần được nhóm xác nhận từ liên kết chia sẻ. [Thư mục Google Drive](https://drive.google.com/drive/folders/1otbkaT-wvJfNERf_CL0uapmz2M2ebSnR?usp=sharing)
+
+Việc phát triển tiếp có thể tập trung vào chia tập theo nhóm ảnh gốc khi có mã nhóm, chạy nhiều seed, khảo sát ngưỡng trên validation, fine-tuning và đo thời gian suy luận. Các kết quả mới cần đi kèm cấu hình và bộ output riêng để đối chiếu.
+
+Các prompt và meta-prompt của dự án được lưu trong thư mục [prompt](prompt/). Prompt mới tiếp tục được lưu tại thư mục này theo quy ước trong AGENTS.md.

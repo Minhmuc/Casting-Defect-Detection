@@ -1,0 +1,28 @@
+.stApp {
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+.block-container {
+    max-width: 1200px;
+    padding-top: 2.5rem;
+    padding-bottom: 2rem;
+}
+
+h1 {
+    color: #173f73;
+    font-size: 2.35rem !important;
+    letter-spacing: -0.035em;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"] > div {
+    background: #ffffff;
+    border-radius: 14px;
+}
+
+[data-testid="stMetricValue"] {
+    color: #173f73;
+}
+
+[data-testid="stImage"] img {
+    border-radius: 9px;
+}

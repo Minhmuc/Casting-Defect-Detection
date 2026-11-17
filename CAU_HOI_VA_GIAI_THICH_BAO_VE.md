@@ -180,8 +180,9 @@ Trong kiểm tra chất lượng, cần chú ý 2 ảnh lỗi bị dự đoán �
 > - **FP (Báo nhầm)**: Phôi đúc đạt nhưng bị báo lỗi, hậu quả chỉ là sản phẩm bị đưa sang làn kiểm tra lại bằng mắt của công nhân (tăng nhẹ chi phí kiểm định).
 > 
 > Nhóm hiện dùng ngưỡng mặc định **0,5** vì đây là ngưỡng tự nhiên so sánh giữa hai điểm lớp. Nếu triển khai trong nhà máy thực tế, nhóm đề xuất **kỹ thuật điều chỉnh ngưỡng (Threshold Tuning)**:
-> - Hạ ngưỡng $p_{ok}$ xuống mức thấp hơn (ví dụ **0,35 đến 0,40**). Khi đó điều kiện để công nhận một sản phẩm "đạt" sẽ khắt khe hơn nhiều.
-> - Kết quả: **Recall lớp lỗi sẽ tiệm cận 100% (triệt tiêu toàn bộ FN)**, chấp nhận FP tăng nhẹ để đảm bảo an toàn tuyệt đối cho chất lượng xuất xưởng.
+> - Quy tắc hiện tại là **p_ok ≥ ngưỡng thì đạt**. Muốn công nhận "đạt" khắt khe hơn thì phải **TĂNG ngưỡng** (ví dụ lên 0,6–0,9), không phải hạ. Hạ ngưỡng sẽ làm **bỏ sót nhiều hơn**.
+> - Tăng ngưỡng giúp giảm FN và tăng recall lớp lỗi, đổi lại FP tăng. Minh họa trên dự đoán test của MobileNetV2: ngưỡng 0,5 cho FN 2 / FP 2; ngưỡng 0,6 cho FN 1 / FP 2; ngưỡng 0,9 cho FN 1 / FP 6; phải lên 0,96 mới có FN 0, nhưng FP tăng lên 9, vì ảnh lỗi `cast_def_0_150.jpeg` có p_ok tới 0,9556.
+> - Khi triển khai thật, ngưỡng phải được chọn trên **validation** theo chi phí bỏ sót và báo nhầm của nhà máy, sau đó mới đánh giá lại trên một tập test riêng. Không hứa "triệt tiêu hoàn toàn FN".
 
 ### Kết quả này nói được gì về dùng ngoài thực tế?
 

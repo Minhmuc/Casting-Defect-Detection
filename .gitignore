@@ -15,9 +15,11 @@ demo/models/*
 Thumbs.db
 .DS_Store
 archive_pytorch/
-data/casting*
+data/casting_data
+data/casting_512x512
 report_work
 reference/
 baocao.docx
 dangbaocao.docx
 Nhom 10_chinh_sua_theo_gop_y.docx
+

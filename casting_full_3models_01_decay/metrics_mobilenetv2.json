@@ -1,0 +1,47 @@
+{
+  "model": "mobilenetv2",
+  "checkpoint_sha256": "ab1aa66857f8d6e1086d9e84fb29dafa73389f377df3f277051aa5366cb55f73",
+  "threshold": 0.5,
+  "test_count": 715,
+  "class_order": [
+    "def_front",
+    "ok_front"
+  ],
+  "classification_report": {
+    "def_front": {
+      "precision": 0.9955849889624724,
+      "recall": 0.9955849889624724,
+      "f1-score": 0.9955849889624724,
+      "support": 453.0
+    },
+    "ok_front": {
+      "precision": 0.9923664122137404,
+      "recall": 0.9923664122137404,
+      "f1-score": 0.9923664122137404,
+      "support": 262.0
+    },
+    "accuracy": 0.9944055944055944,
+    "macro avg": {
+      "precision": 0.9939757005881065,
+      "recall": 0.9939757005881065,
+      "f1-score": 0.9939757005881065,
+      "support": 715.0
+    },
+    "weighted avg": {
+      "precision": 0.9944055944055944,
+      "recall": 0.9944055944055944,
+      "f1-score": 0.9944055944055944,
+      "support": 715.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      451,
+      2
+    ],
+    [
+      2,
+      260
+    ]
+  ]
+}

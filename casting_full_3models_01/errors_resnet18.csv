@@ -1,0 +1,10 @@
+path,true,predicted,p_ok,p_defect
+test/def_front/cast_def_0_1063.jpeg,0,1,0.5529835,0.44701648
+test/def_front/cast_def_0_150.jpeg,0,1,0.97993016,0.020069838
+test/def_front/cast_def_0_1536.jpeg,0,1,0.54898256,0.45101744
+test/def_front/cast_def_0_1591.jpeg,0,1,0.9290985,0.07090151
+test/def_front/cast_def_0_1614.jpeg,0,1,0.86259323,0.13740677
+test/def_front/cast_def_0_2177.jpeg,0,1,0.9878043,0.012195706
+test/def_front/cast_def_0_2483.jpeg,0,1,0.8219491,0.17805088
+test/ok_front/cast_ok_0_10.jpeg,1,0,0.3557832,0.6442168
+test/ok_front/cast_ok_0_1368.jpeg,1,0,0.11690977,0.88309026

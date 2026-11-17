@@ -1,0 +1,13 @@
+{
+  "model": "mobilenetv2",
+  "criterion": "minimum_best_validation_loss",
+  "best_epoch": 13,
+  "validation_loss": 0.0157744828611612,
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "checkpoint_sha256": "ab1aa66857f8d6e1086d9e84fb29dafa73389f377df3f277051aa5366cb55f73",
+  "candidates": {
+    "cnn": 0.1812310963869094,
+    "resnet18": 0.0294968094676733,
+    "mobilenetv2": 0.0157744828611612
+  }
+}

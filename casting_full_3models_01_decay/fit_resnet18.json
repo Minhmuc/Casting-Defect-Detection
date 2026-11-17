@@ -1,0 +1,26 @@
+{
+  "model": "resnet18",
+  "status": "completed",
+  "epochs_requested": 30,
+  "seed": 42,
+  "pipeline_augmentation": false,
+  "source_augmentation": true,
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "learning_rate_schedule": {
+    "name": "CosineDecay",
+    "initial_learning_rate": 0.001,
+    "minimum_learning_rate": 1e-05,
+    "alpha": 0.01,
+    "decay_steps": 5250
+  },
+  "steps_per_epoch": 175,
+  "total_params": 11219009,
+  "trainable_params": 32897,
+  "started_at_utc": "2026-11-10T22:03:55.367881+00:00",
+  "epochs_completed": 30,
+  "best_epoch": 30,
+  "best_validation_loss": 0.0294968094676733,
+  "best_validation_accuracy": 0.9858012199401855,
+  "checkpoint_sha256": "97137574f68a7a2ad7df6ae54664bd5bc764b9df6689a55967906754ca5ed1a1",
+  "fit_seconds": 1025.272269507
+}

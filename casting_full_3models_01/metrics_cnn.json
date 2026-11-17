@@ -1,0 +1,47 @@
+{
+  "model": "cnn",
+  "checkpoint_sha256": "aa79033bdcaf8fbf773dab5f7b2bc345c2b87e7f8ca7c47234e31e568afa8149",
+  "threshold": 0.5,
+  "test_count": 715,
+  "class_order": [
+    "def_front",
+    "ok_front"
+  ],
+  "classification_report": {
+    "def_front": {
+      "precision": 0.9727272727272728,
+      "recall": 0.9448123620309051,
+      "f1-score": 0.9585666293393057,
+      "support": 453.0
+    },
+    "ok_front": {
+      "precision": 0.9090909090909091,
+      "recall": 0.9541984732824428,
+      "f1-score": 0.931098696461825,
+      "support": 262.0
+    },
+    "accuracy": 0.9482517482517483,
+    "macro avg": {
+      "precision": 0.9409090909090909,
+      "recall": 0.949505417656674,
+      "f1-score": 0.9448326629005653,
+      "support": 715.0
+    },
+    "weighted avg": {
+      "precision": 0.9494087730451367,
+      "recall": 0.9482517482517483,
+      "f1-score": 0.9485014567324527,
+      "support": 715.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      428,
+      25
+    ],
+    [
+      12,
+      250
+    ]
+  ]
+}

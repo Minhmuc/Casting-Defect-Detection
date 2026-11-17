@@ -27,9 +27,9 @@ Ví dụ, ảnh thật sự đạt. Hai dự đoán cho điểm đạt 0,51 và 
 
 Có thể hình dung phần trích xuất đặc trưng chuyển ảnh thành một nhóm con số mô tả ảnh. Đầu phân loại đọc các con số đó để đưa ra nhãn. Cách tận dụng phần đã học trước gọi là **học chuyển giao**.
 
-- **CNN.** Tỷ lệ đúng trên validation tăng từ 57,20% sau epoch đầu lên 95,84% tại epoch 29. Các đỉnh dao động thấy rõ ở epoch 9 và 18. [Biểu đồ CNN](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_cnn.png)
-- **ResNet-18.** Tỷ lệ đúng trên validation đạt 95,44% sau epoch đầu và 98,78% tại epoch 29. Epoch 30 có tỷ lệ đúng nhỉnh hơn, 98,88%, nhưng validation loss tăng từ 0,02695 lên 0,02946. Nhóm lưu epoch 29 theo tiêu chí loss. [Biểu đồ ResNet-18](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_resnet18.png)
-- **MobileNetV2.** Tại epoch 21, validation loss đạt mức thấp nhất là 0,01503 và tỷ lệ đúng là 99,49%. Đây là checkpoint được dùng để đánh giá test và chạy demo. [Biểu đồ MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_mobilenetv2.png)
+- **CNN.** Tỷ lệ đúng trên validation tăng từ 57,20% sau epoch đầu lên 95,84% tại epoch 29. Các đỉnh dao động thấy rõ ở epoch 9 và 18. [Biểu đồ CNN](casting_full_3models_01/learning_curves_cnn.png)
+- **ResNet-18.** Tỷ lệ đúng trên validation đạt 95,44% sau epoch đầu và 98,78% tại epoch 29. Epoch 30 có tỷ lệ đúng nhỉnh hơn, 98,88%, nhưng validation loss tăng từ 0,02695 lên 0,02946. Nhóm lưu epoch 29 theo tiêu chí loss. [Biểu đồ ResNet-18](casting_full_3models_01/learning_curves_resnet18.png)
+- **MobileNetV2.** Tại epoch 21, validation loss đạt mức thấp nhất là 0,01503 và tỷ lệ đúng là 99,49%. Đây là checkpoint được dùng để đánh giá test và chạy demo. [Biểu đồ MobileNetV2](casting_full_3models_01/learning_curves_mobilenetv2.png)
 
 ### Accuracy lên 0,99 có phải quá khớp?
 
@@ -68,7 +68,7 @@ Với **CNN** và **ResNet-18**, đường validation nhìn chung cải thiện 
 
 Nếu được hỏi chính xác vì sao từng đỉnh xảy ra, em có thể nói rằng trọng số thay đổi sau mỗi lượt huấn luyện nên dự đoán trên cùng tập validation cũng thay đổi. Lịch sử lưu loss và accuracy theo epoch, nên nhóm đọc được mức dao động và sự phục hồi, còn nguyên nhân cụ thể của từng đỉnh chưa được xác định.
 
-[Lịch sử CNN](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_cnn.csv) · [Lịch sử ResNet-18](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_resnet18.csv) · [Lịch sử MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_mobilenetv2.csv)
+[Lịch sử CNN](casting_full_3models_01/history_cnn.csv) · [Lịch sử ResNet-18](casting_full_3models_01/history_resnet18.csv) · [Lịch sử MobileNetV2](casting_full_3models_01/history_mobilenetv2.csv)
 
 ### Vì sao validation đôi lúc tốt hơn train?
 
@@ -78,7 +78,7 @@ Khi validation tốt hơn train ở một số epoch, có thể giải thích b�
 
 > 30 epoch là số lượt học nhóm đặt cho cả ba mô hình. Sau mỗi lượt, nhóm kiểm tra validation và giữ bản mô hình có loss thấp nhất. Bản lưu đó gọi là checkpoint. MobileNetV2 cho loss thấp nhất ở epoch 21, nên nhóm dùng bản lưu ở đó để kiểm tra trên test.
 
-Có hai quyết định cần nhớ. Trước hết chọn **một checkpoint cho mỗi mô hình**. Sau đó so sánh validation loss của ba checkpoint để chọn mô hình dùng cho demo. MobileNetV2 có giá trị thấp nhất trong lần thực nghiệm này. [Bảng kết quả](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/comparison.csv) · [Kết quả chọn checkpoint](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/selection.json)
+Có hai quyết định cần nhớ. Trước hết chọn **một checkpoint cho mỗi mô hình**. Sau đó so sánh validation loss của ba checkpoint để chọn mô hình dùng cho demo. MobileNetV2 có giá trị thấp nhất trong lần thực nghiệm này. [Bảng kết quả](casting_full_3models_01/comparison.csv) · [Kết quả chọn checkpoint](casting_full_3models_01/selection.json)
 
 ## 2. Dữ liệu và cách chia tập
 
@@ -96,11 +96,12 @@ Có hai quyết định cần nhớ. Trước hết chọn **một checkpoint ch
 
 Nếu cùng một ảnh xuất hiện trong train và test, kết quả test có thể tăng vì mô hình gặp lại ảnh từng học. Nhóm so sánh pixel để loại bản sao chính xác. Những ảnh gần giống do biến đổi hoặc nhiều ảnh chụp cùng một sản phẩm vẫn khó xác định khi thiếu thông tin ảnh gốc.
 
-Nhóm dùng seed 42 để có thể tái lập cách chia. Cách chia theo tỷ lệ lớp giúp train và validation có tỷ lệ ảnh lỗi, ảnh đạt gần với tập đem chia. Dữ liệu nguồn đã có ảnh tăng cường. Trong lượt này, nhóm dùng trực tiếp các ảnh đã chia và áp dụng các bước tiền xử lý đầu vào. [Thống kê sau chia tập](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/split_counts.csv)
+Nhóm dùng seed 42 để có thể tái lập cách chia. Cách chia theo tỷ lệ lớp giúp train và validation có tỷ lệ ảnh lỗi, ảnh đạt gần với tập đem chia. Dữ liệu nguồn đã có ảnh tăng cường. Trong lượt này, nhóm dùng trực tiếp các ảnh đã chia và áp dụng các bước tiền xử lý đầu vào. [Thống kê sau chia tập](casting_full_3models_01/split_counts.csv)
 
-### Vì sao dùng ảnh xám? Vì sao hai mô hình cần ba kênh?
+### Vì sao dùng ảnh xám? Vì sao hai mô hình học trước cần ba kênh?
 
-> Nhóm đưa ảnh về cùng kích thước để mô hình có đầu vào thống nhất. CNN nhận ảnh xám 256 × 256 với một kênh. ResNet-18 và MobileNetV2 nhận đầu vào 224 × 224 với ba kênh, nên nhóm đổi kích thước rồi lặp cùng kênh xám ba lần để phù hợp đầu vào của mô hình học trước.
+> Ảnh chụp bề mặt kim loại chủ yếu phản ánh thông tin hình học, độ tương phản và biên dạng khuyết tật qua cường độ sáng chứ không phụ thuộc vào màu sắc. Do đó chuyển xám giúp chuẩn hóa đầu vào và tiết kiệm chi phí tính toán.
+> CNN nhận trực tiếp ảnh xám 256 × 256 × 1. Ngược lại, hai backbone ResNet-18 và MobileNetV2 được huấn luyện trước trên tập ImageNet với kích thước chuẩn 224 × 224 × 3 kênh màu. Nhóm sao chép kênh xám ba lần để khớp định dạng tensor đầu vào của backbone đã học trước. Việc này giúp tận dụng nguyên vẹn trọng số trích xuất đặc trưng của ImageNet mà không làm biến dạng thông tin gốc hay cần sửa đổi tầng Conv đầu tiên.
 
 ## 3. CNN hoạt động thế nào?
 
@@ -122,7 +123,22 @@ Nhóm dùng seed 42 để có thể tái lập cách chia. Cách chia theo tỷ 
 
 > Ảnh đi qua mô hình để tạo dự đoán. Hàm mất mát so dự đoán với nhãn thật. Gradient cho biết thay đổi các trọng số sẽ tác động đến loss thế nào. Adam dùng thông tin đó để điều chỉnh trọng số qua từng batch.
 
-**Learning rate** điều chỉnh độ lớn của bước cập nhật. Lượt chính dùng Adam với learning rate khởi đầu **0,001**. Khi validation loss không cải thiện đủ trong 3 epoch, ReduceLROnPlateau giảm learning rate còn một nửa. Cơ chế lưu checkpoint theo validation loss hoạt động sau mỗi epoch. [Notebook và cấu hình huấn luyện](D:/Casting-Defect-Detection-CNN/Casting.ipynb)
+**Learning rate** điều chỉnh độ lớn của bước cập nhật. Lượt chính dùng Adam với learning rate khởi đầu **0,001**. Khi validation loss không cải thiện đủ trong 3 epoch, ReduceLROnPlateau giảm learning rate còn một nửa. Cơ chế lưu checkpoint theo validation loss hoạt động sau mỗi epoch. [Notebook và cấu hình huấn luyện](Casting.ipynb)
+
+### Vì sao MobileNetV2 ít tham số tổng hơn ResNet-18 nhưng tham số được cập nhật lại nhiều hơn?
+
+> MobileNetV2 có tổng cộng khoảng 2,34 triệu tham số, nhẹ hơn nhiều so với 11,22 triệu tham số của ResNet-18 do dùng tích chập tách biệt theo chiều sâu (depthwise separable convolution).
+> Tuy nhiên, trước tầng Global Average Pooling (GAP), MobileNetV2 tạo ra tensor có **1.280 kênh đặc trưng**, trong khi ResNet-18 chỉ có **512 kênh**.
+> Khi đưa vào đầu phân loại mới (`Dense(64)`), lớp này của MobileNetV2 nhận 1.280 giá trị đầu vào nên cần `(1.280 + 1) × 64 = 82.048` trọng số, cộng 65 trọng số của lớp Dense cuối tạo ra **82.049 tham số được cập nhật**. Với ResNet-18, đầu vào chỉ có 512 giá trị nên lớp Dense chỉ cần `(512 + 1) × 64 = 32.832` trọng số, cộng 65 là **32.897 tham số**.
+
+### Khối Inverted Residual của MobileNetV2 khác gì khối Residual của ResNet-18?
+
+> ResNet dùng khối dư cơ bản theo hướng **nén rồi mở rộng hoặc giữ nguyên kênh** (dày → mỏng → dày), kết nối tắt cộng tensor giữa các tầng có nhiều kênh.
+> MobileNetV2 đi theo hướng **đảo ngược (mỏng → dày → mỏng)**:
+> 1. Dùng Conv 1×1 mở rộng số kênh gấp 6 lần (từ mỏng lên dày) để mở rộng không gian biểu diễn đặc trưng.
+> 2. Dùng Depthwise Conv 3×3 trích xuất không gian riêng biệt trên từng kênh, giúp giảm 8 đến 9 lần khối lượng tính toán so với tích chập tiêu chuẩn.
+> 3. Dùng Conv 1×1 nén số kênh lại (Linear Bottleneck), không dùng hàm kích hoạt phi tuyến ở cuối để tránh phá hủy thông tin.
+> 4. Nhánh tắt (skip connection) kết nối trực tiếp giữa các tầng thắt nút mỏng, giúp tiết kiệm tối đa bộ nhớ khi truyền xuôi và ngược.
 
 ### Ba mô hình có được so sánh trong cùng điều kiện?
 
@@ -155,7 +171,17 @@ Nếu giảng viên chỉ vào ma trận nhầm lẫn, hãy đọc **hàng là n
 | Lỗi | 451 phát hiện đúng (TP) | 2 bỏ sót (FN) |
 | Đạt | 2 báo lỗi nhầm (FP) | 260 nhận đúng ảnh đạt (TN) |
 
-Trong kiểm tra chất lượng, cần chú ý 2 ảnh lỗi bị dự đoán đạt vì đó là lỗi bị bỏ sót. [Ma trận và chỉ số MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/metrics_mobilenetv2.json)
+Trong kiểm tra chất lượng, cần chú ý 2 ảnh lỗi bị dự đoán đạt vì đó là lỗi bị bỏ sót. [Ma trận và chỉ số MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json)
+
+### Trong công nghiệp thực tế, bỏ sót lỗi (FN) hay báo nhầm (FP) nguy hiểm hơn? Nếu áp dụng vào nhà máy, nhóm sẽ điều chỉnh gì?
+
+> Trong sản xuất thực tế, **bỏ sót sản phẩm lỗi (FN)** nghiêm trọng hơn rất nhiều so với báo nhầm sản phẩm đạt thành lỗi (FP):
+> - **FN (Bỏ sót lỗi)**: Phôi đúc bị khuyết tật (nứt, rỗ khí) nhưng bị lọt qua khâu kiểm định, đi vào dây chuyền lắp ráp máy móc hoặc bàn giao cho khách hàng, có thể dẫn đến gãy vỡ chi tiết cơ khí khi vận hành, gây tai nạn hoặc đền bù thiệt hại rất lớn.
+> - **FP (Báo nhầm)**: Phôi đúc đạt nhưng bị báo lỗi, hậu quả chỉ là sản phẩm bị đưa sang làn kiểm tra lại bằng mắt của công nhân (tăng nhẹ chi phí kiểm định).
+> 
+> Nhóm hiện dùng ngưỡng mặc định **0,5** vì đây là ngưỡng tự nhiên so sánh giữa hai điểm lớp. Nếu triển khai trong nhà máy thực tế, nhóm đề xuất **kỹ thuật điều chỉnh ngưỡng (Threshold Tuning)**:
+> - Hạ ngưỡng $p_{ok}$ xuống mức thấp hơn (ví dụ **0,35 đến 0,40**). Khi đó điều kiện để công nhận một sản phẩm "đạt" sẽ khắt khe hơn nhiều.
+> - Kết quả: **Recall lớp lỗi sẽ tiệm cận 100% (triệt tiêu toàn bộ FN)**, chấp nhận FP tăng nhẹ để đảm bảo an toàn tuyệt đối cho chất lượng xuất xưởng.
 
 ### Kết quả này nói được gì về dùng ngoài thực tế?
 
@@ -177,7 +203,7 @@ Quy ước của nhóm là **lỗi = 0, đạt = 1**. Mã nhãn dùng để lưu
 
 > Nhóm nạp lại tệp mô hình trên CPU và đối chiếu với kết quả dự đoán đã lưu trên 10 ảnh validation. Cả 10 ảnh cho cùng nhãn. Phép kiểm tra cho biết tệp mô hình sau khi nạp lại giữ được kết quả dự đoán trên các ảnh được đối chiếu.
 
-[Output minh họa trong notebook](D:/Casting-Defect-Detection-CNN/Casting.ipynb) · [Kết quả kiểm chứng CPU](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/demo/verification.json)
+[Output minh họa trong notebook](Casting.ipynb) · [Kết quả kiểm chứng CPU](casting_full_3models_01/demo/verification.json)
 
 ## 6. Bài nói mẫu khi tới phần thực nghiệm
 

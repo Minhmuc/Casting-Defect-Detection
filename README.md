@@ -275,7 +275,10 @@ Mỗi thành viên nên tập giải thích được cách chia tập, đường
 | Spike có chứng minh overfitting? | Cần đọc nhiều epoch. Báo cáo ghi nhận mức giảm và phục hồi ở từng mạng, đồng thời giữ nguyên mức chưa xác định của nguyên nhân cụ thể. |
 | Vì sao chọn MobileNetV2 epoch 21? | Đây là checkpoint có validation loss thấp nhất theo tiêu chí đã đặt và được lưu trước bước đánh giá test. |
 | Precision, recall lớp lỗi có ý nghĩa gì? | Precision xét các ảnh bị báo lỗi, recall xét các ảnh thực sự lỗi. Với MobileNetV2, cả hai bằng 451/453, khoảng 99,56%. |
+| Vì sao MobileNetV2 ít tham số tổng nhưng tham số học lại nhiều hơn ResNet-18? | MobileNetV2 tạo ra 1.280 kênh đặc trưng trước GAP (so với 512 của ResNet-18), nên lớp Dense 64 của nó nhận nhiều đầu vào hơn và học 82.049 tham số (so với 32.897 tham số của ResNet-18). |
+| Khối Inverted Residual của MobileNetV2 khác gì Residual của ResNet-18? | ResNet nén rồi mở rộng (dày-mỏng-dày); MobileNetV2 mở rộng kênh gấp 6 lần, dùng Depthwise Conv tiết kiệm tính toán, nén tuyến tính (Linear Bottleneck) và nối tắt giữa các tầng ít kênh. |
 | Điểm đạt cao có bảo đảm đúng? | Có ảnh lỗi `cast_def_0_150.jpeg` nhận điểm đạt 0,955552. Điểm sigmoid cần được đọc cùng dự đoán sai và phạm vi kiểm chứng. |
+| Trong nhà máy thực tế, FN hay FP nguy hiểm hơn và nhóm chỉnh thế nào? | FN (bỏ sót lỗi) nguy hiểm nhất vì đưa chi tiết hỏng ra thị trường. Khi triển khai công nghiệp, có thể hạ ngưỡng p_ok (xuống 0,35–0,40) để tối đa Recall lớp lỗi và triệt tiêu FN. |
 | Có áp dụng ngoài nhà máy ngay được? | Kết quả hiện có gắn với tập test cùng nguồn. Ảnh độc lập theo sản phẩm, camera và ánh sáng là dữ liệu cần bổ sung để đánh giá phạm vi sử dụng rộng hơn. |
 | Nhóm đã so sánh tốc độ chạy mỗi ảnh chưa? | Các thời gian 300,36 / 990,97 / 557,11 giây là thời gian huấn luyện và validation trên T4. Độ trễ dự đoán là phép đo cần tổ chức riêng. |
 

@@ -83,11 +83,21 @@ ResNet-18 dùng các kết nối tắt, cộng đầu vào của khối với k�
 | ResNet-18 | 11.219.009 | 32.897 |
 | MobileNetV2 | 2.340.033 | 82.049 |
 
+**Vì sao MobileNetV2 ít tham số tổng hơn ResNet-18 nhưng tham số học lại nhiều hơn?**
+
+> MobileNetV2 tổng thể rất nhẹ (2,34M tham số) nhờ các khối tích chập tách biệt theo chiều sâu (depthwise separable convolution). Tuy nhiên, tầng trích chọn đặc trưng cuối cùng trước khi vào GAP của MobileNetV2 có tới **1.280 kênh đặc trưng**, trong khi ResNet-18 chỉ có **512 kênh**.
+> Lớp phân loại `Dense(64)` của MobileNetV2 nhận 1.280 đầu vào nên có `(1.280 + 1) × 64 = 82.048` trọng số, cộng 65 trọng số ở `Dense(1)` thành **82.049 tham số**. ResNet-18 chỉ nhận 512 đầu vào nên lớp Dense chỉ có `(512 + 1) × 64 = 32.832` trọng số, cộng 65 thành **32.897 tham số**.
+
+**Khối Inverted Residual của MobileNetV2 khác gì Basic Residual của ResNet-18?**
+
+> ResNet dùng khối dư cơ bản (Basic Residual Block) nối tắt giữa các tầng nhiều kênh (dày → mỏng → dày hoặc giữ nguyên kênh).
+> MobileNetV2 đảo ngược cấu trúc này (Inverted Residual Block - mỏng → dày → mỏng): dùng Conv 1×1 mở rộng số kênh gấp 6 lần, áp dụng Depthwise Conv 3×3 xử lý riêng từng kênh (tiết kiệm 8–9 lần tính toán), sau đó dùng Conv 1×1 nén tuyến tính (Linear Bottleneck) và kết nối tắt giữa các tầng thắt nút hẹp.
+
 **Câu nói mẫu**
 
 > Với CNN, nhóm học toàn bộ trọng số từ đầu. Với hai mô hình học trước, nhóm giữ cố định phần trích xuất đặc trưng và chỉ học đầu phân loại mới. Vì vậy, kết quả so sánh phản ánh cả kiến trúc, trọng số học trước và cách tiền xử lý của từng cấu hình.
 
-Đóng băng giữ nguyên trọng số backbone, còn phép tính đặc trưng vẫn được thực hiện cho các ảnh. Điều này giúp giải thích tại sao ResNet-18 có ít tham số được học hơn CNN nhưng thời gian fit vẫn dài hơn trong lượt chạy.
+Đóng băng giữ nguyên trọng số backbone, còn phép tính đặc trưng vẫn được thực hiện cho các ảnh. Điều này giúp giải thích tại sao ResNet-18 có ít tham số được học hơn CNN nhưng thời gian fit vẫn dài hơn trong lượt chạy (do backbone sâu và nặng hơn khi tính toán lan truyền xuôi).
 
 ### 2.4. Huấn luyện và lựa chọn
 
@@ -122,7 +132,7 @@ Khi giải thích một đường cong, nói theo ba ý.
 
 ### 3.3.2. CNN
 
-![Đường cong huấn luyện CNN](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_cnn.png)
+![Đường cong huấn luyện CNN](casting_full_3models_01/learning_curves_cnn.png)
 
 Đầu lượt, accuracy khoảng 57% và loss khoảng 0,69. Đến epoch 29, train accuracy 94,36%, validation accuracy 95,84%. Cả hai tập đều cải thiện đáng kể, dù validation có hai đỉnh rõ.
 
@@ -143,7 +153,7 @@ Khi giải thích một đường cong, nói theo ba ý.
 
 ### 3.3.3. ResNet-18
 
-![Đường cong huấn luyện ResNet-18](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_resnet18.png)
+![Đường cong huấn luyện ResNet-18](casting_full_3models_01/learning_curves_resnet18.png)
 
 ResNet-18 đạt validation accuracy 95,44% ngay epoch 1. Backbone học trước đã cung cấp đặc trưng hữu ích, đầu phân loại thích nghi nhanh hơn CNN học từ đầu trong cấu hình này.
 
@@ -155,7 +165,7 @@ Một chi tiết để giải thích loss và accuracy là epoch 30 có validati
 
 ### 3.3.4. MobileNetV2
 
-![Đường cong huấn luyện MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/learning_curves_mobilenetv2.png)
+![Đường cong huấn luyện MobileNetV2](casting_full_3models_01/learning_curves_mobilenetv2.png)
 
 | Epoch trình bày | Validation loss | Validation accuracy | Số ảnh sai trên 986 ảnh |
 |---|---:|---:|---:|
@@ -260,7 +270,7 @@ Mô hình chọn là MobileNetV2 epoch 21, tệp `casting_classifier.keras`. Ki�
 
 Ảnh minh họa của báo cáo là cast_ok_0_45.jpeg từ output đã lưu, dự đoán đạt 99,82%. Ảnh cùng tên trong test có xác suất khớp kết quả hiển thị. Một ảnh minh họa cung cấp ví dụ về cách sử dụng mô hình. Bằng chứng định lượng nằm ở bảng đánh giá toàn tập.
 
-Giao diện local hiện có code trong `demo/app.py`. Kết quả nạp trên CPU có trong gói output, còn ảnh minh họa báo cáo lấy từ chương trình thực nghiệm. Khi bảo vệ, chỉ mô tả việc chạy giao diện local theo đúng những bước nhóm đã tự chạy và xác nhận. Hướng dẫn khởi động nằm trong [demo/README.md](D:/Casting-Defect-Detection-CNN/demo/README.md).
+Giao diện local hiện có code trong `demo/app.py`. Kết quả nạp trên CPU có trong gói output, còn ảnh minh họa báo cáo lấy từ chương trình thực nghiệm. Khi bảo vệ, chỉ mô tả việc chạy giao diện local theo đúng những bước nhóm đã tự chạy và xác nhận. Hướng dẫn khởi động nằm trong [demo/README.md](demo/README.md).
 
 ## 7. Trình tự nói khi bảo vệ
 
@@ -292,9 +302,9 @@ Chương 1 cung cấp kiến thức nền để trả lời. Khi trình bày ch�
 
 ## 9. Mở output nào để đối chiếu
 
-- [Notebook có output](D:/Casting-Defect-Detection-CNN/Casting.ipynb) để kiểm tra các lớp mạng, pipeline, callbacks và ảnh minh họa.
-- [Lịch sử CNN](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_cnn.csv), [ResNet-18](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_resnet18.csv), [MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/history_mobilenetv2.csv) để kiểm tra từng epoch.
-- [Bảng so sánh](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/comparison.csv) và [ma trận MobileNetV2](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/metrics_mobilenetv2.json) để kiểm tra các chỉ số test.
-- [Quyết định chọn mô hình](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/selection.json) và [kiểm chứng CPU](D:/Casting-Defect-Detection-CNN/casting_full_3models_01/demo/verification.json) để kiểm tra checkpoint và độ nhất quán sau nạp.
+- [Notebook có output](Casting.ipynb) để kiểm tra các lớp mạng, pipeline, callbacks và ảnh minh họa.
+- [Lịch sử CNN](casting_full_3models_01/history_cnn.csv), [ResNet-18](casting_full_3models_01/history_resnet18.csv), [MobileNetV2](casting_full_3models_01/history_mobilenetv2.csv) để kiểm tra từng epoch.
+- [Bảng so sánh](casting_full_3models_01/comparison.csv) và [ma trận MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json) để kiểm tra các chỉ số test.
+- [Quyết định chọn mô hình](casting_full_3models_01/selection.json) và [kiểm chứng CPU](casting_full_3models_01/demo/verification.json) để kiểm tra checkpoint và độ nhất quán sau nạp.
 
 Các số ảnh sai theo epoch trong hướng dẫn được tính từ 986 × (1 − val_accuracy), làm tròn về số nguyên. Đây là số tổng hợp, chưa cho biết danh tính từng ảnh sai ở epoch tương ứng.

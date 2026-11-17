@@ -1,0 +1,47 @@
+{
+  "model": "resnet18",
+  "checkpoint_sha256": "82e4c598a6897b9ea9441862755c72baa6ad8a21ce1b78c5e5a53ab2bf7b3e59",
+  "threshold": 0.5,
+  "test_count": 715,
+  "class_order": [
+    "def_front",
+    "ok_front"
+  ],
+  "classification_report": {
+    "def_front": {
+      "precision": 0.9955357142857143,
+      "recall": 0.9845474613686535,
+      "f1-score": 0.9900110987791343,
+      "support": 453.0
+    },
+    "ok_front": {
+      "precision": 0.9737827715355806,
+      "recall": 0.9923664122137404,
+      "f1-score": 0.9829867674858223,
+      "support": 262.0
+    },
+    "accuracy": 0.9874125874125874,
+    "macro avg": {
+      "precision": 0.9846592429106474,
+      "recall": 0.988456936791197,
+      "f1-score": 0.9864989331324783,
+      "support": 715.0
+    },
+    "weighted avg": {
+      "precision": 0.9875647058933577,
+      "recall": 0.9874125874125874,
+      "f1-score": 0.987437148011515,
+      "support": 715.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      446,
+      7
+    ],
+    [
+      2,
+      260
+    ]
+  ]
+}

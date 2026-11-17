@@ -1,0 +1,18 @@
+{
+  "model": "resnet18",
+  "status": "completed",
+  "epochs_requested": 30,
+  "seed": 42,
+  "pipeline_augmentation": false,
+  "source_augmentation": true,
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "total_params": 11219009,
+  "trainable_params": 32897,
+  "started_at_utc": "2026-11-10T18:06:52.339311+00:00",
+  "epochs_completed": 30,
+  "best_epoch": 29,
+  "best_validation_loss": 0.0269456189125776,
+  "best_validation_accuracy": 0.9878296256065368,
+  "checkpoint_sha256": "82e4c598a6897b9ea9441862755c72baa6ad8a21ce1b78c5e5a53ab2bf7b3e59",
+  "fit_seconds": 990.967285637
+}

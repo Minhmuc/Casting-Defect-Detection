@@ -1,0 +1,7 @@
+{
+  "image": "cast_def_0_40.jpeg",
+  "model": "mobilenetv2",
+  "predicted_label": 0,
+  "p_ok": 1.32120017132991e-17,
+  "model_sha256": "222c232e6b873f62f32042133db6f88a15298f75e23e307857903367941f7f65"
+}

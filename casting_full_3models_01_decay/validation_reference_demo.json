@@ -1,0 +1,79 @@
+{
+  "records": [
+    {
+      "path": "train/ok_front/cast_ok_0_6947.jpeg",
+      "label": 1,
+      "sha256": "9c79e38f7171f8dda645577d544fad4a76a12c96472de05a01aca7bd26994710",
+      "source_split": "train"
+    },
+    {
+      "path": "train/ok_front/cast_ok_0_9229.jpeg",
+      "label": 1,
+      "sha256": "cdc92d995fbcd6d37eca94f6a79134f51e7d0c359c125c2eec9929119b28485f",
+      "source_split": "train"
+    },
+    {
+      "path": "train/ok_front/cast_ok_0_4892.jpeg",
+      "label": 1,
+      "sha256": "bf1c1142846437e5c88a8452492f548d209a071ffa2be2afb58ddb262b642f13",
+      "source_split": "train"
+    },
+    {
+      "path": "train/ok_front/cast_ok_0_6324.jpeg",
+      "label": 1,
+      "sha256": "bdc144c60b5878ec142ea2f7527b9fed34efc14a01abd6b03dc11cf1debc5c40",
+      "source_split": "train"
+    },
+    {
+      "path": "train/ok_front/cast_ok_0_2497.jpeg",
+      "label": 1,
+      "sha256": "cfd1e39e0487d800aa96044f3b4b171e0f35cbac478affd654e625a753c31fb5",
+      "source_split": "train"
+    },
+    {
+      "path": "train/def_front/cast_def_0_1762.jpeg",
+      "label": 0,
+      "sha256": "e5d55db12a3c16619f14de1abffab51aff389b901c1254bccedb16fc3ca12d8a",
+      "source_split": "train"
+    },
+    {
+      "path": "train/def_front/cast_def_0_6065.jpeg",
+      "label": 0,
+      "sha256": "ab125d8835fb09ae6a2881159d9f203eb27d3c25a08db4ce68973ef53b008597",
+      "source_split": "train"
+    },
+    {
+      "path": "train/def_front/cast_def_0_8331.jpeg",
+      "label": 0,
+      "sha256": "b1f235f7cb47dbe79448f9da87a0d5681095d3bcd4824da89d1be20818daa696",
+      "source_split": "train"
+    },
+    {
+      "path": "train/def_front/cast_def_0_5746.jpeg",
+      "label": 0,
+      "sha256": "cdf080502f998f69b9f86e7090fca83d46b258627a449fd8b3e0506c7206ec98",
+      "source_split": "train"
+    },
+    {
+      "path": "train/def_front/cast_def_0_5282.jpeg",
+      "label": 0,
+      "sha256": "fcdfe15f41200cb886bfc7524a365ba05c3f6b907542e8b2d8b590ffdbb848fb",
+      "source_split": "train"
+    }
+  ],
+  "model": "mobilenetv2",
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "p_ok": [
+    0.9992613196372986,
+    0.9999197721481323,
+    0.9999607801437378,
+    0.9959165453910828,
+    0.9999845027923584,
+    1.6798541764728725e-05,
+    0.01049757283180952,
+    0.0008389888680540025,
+    3.306430755856127e-07,
+    5.526639142772183e-05
+  ],
+  "checkpoint_sha256": "ab1aa66857f8d6e1086d9e84fb29dafa73389f377df3f277051aa5366cb55f73"
+}

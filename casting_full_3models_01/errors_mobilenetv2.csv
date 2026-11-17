@@ -1,0 +1,5 @@
+path,true,predicted,p_ok,p_defect
+test/def_front/cast_def_0_150.jpeg,0,1,0.9555523,0.04444772
+test/def_front/cast_def_0_2102.jpeg,0,1,0.5023788,0.49762118
+test/ok_front/cast_ok_0_16.jpeg,1,0,0.2288838,0.7711162
+test/ok_front/cast_ok_0_7839.jpeg,1,0,0.24499236,0.7550076

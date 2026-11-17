@@ -16,7 +16,6 @@ Thumbs.db
 .DS_Store
 archive_pytorch/
 data/casting*
-casting_full*
 report_work
 reference/
 baocao.docx

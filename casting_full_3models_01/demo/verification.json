@@ -1,0 +1,7 @@
+{
+  "images": 10,
+  "labels_agree": true,
+  "rtol": 0.001,
+  "atol": 0.0001,
+  "max_probability_error": 4.21423465013504e-08
+}

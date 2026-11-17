@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+   def_front       0.92      0.93      0.93       453
+    ok_front       0.88      0.87      0.87       262
+
+    accuracy                           0.91       715
+   macro avg       0.90      0.90      0.90       715
+weighted avg       0.91      0.91      0.91       715

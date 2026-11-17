@@ -1,0 +1,18 @@
+{
+  "model": "cnn",
+  "status": "completed",
+  "epochs_requested": 30,
+  "seed": 42,
+  "pipeline_augmentation": false,
+  "source_augmentation": true,
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "total_params": 100993,
+  "trainable_params": 100993,
+  "started_at_utc": "2026-11-10T17:59:55.590817+00:00",
+  "epochs_completed": 30,
+  "best_epoch": 29,
+  "best_validation_loss": 0.1210098415613174,
+  "best_validation_accuracy": 0.95841783285141,
+  "checkpoint_sha256": "aa79033bdcaf8fbf773dab5f7b2bc345c2b87e7f8ca7c47234e31e568afa8149",
+  "fit_seconds": 300.36348129499993
+}

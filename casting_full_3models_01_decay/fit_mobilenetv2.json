@@ -1,0 +1,26 @@
+{
+  "model": "mobilenetv2",
+  "status": "completed",
+  "epochs_requested": 30,
+  "seed": 42,
+  "pipeline_augmentation": false,
+  "source_augmentation": true,
+  "manifest_sha256": "4c8d5fa781240d0bf5a00e60941ac5ef09e87e9b2defd1bb6ef06107ccc91d04",
+  "learning_rate_schedule": {
+    "name": "CosineDecay",
+    "initial_learning_rate": 0.001,
+    "minimum_learning_rate": 1e-05,
+    "alpha": 0.01,
+    "decay_steps": 5250
+  },
+  "steps_per_epoch": 175,
+  "total_params": 2340033,
+  "trainable_params": 82049,
+  "started_at_utc": "2026-11-10T22:21:43.308960+00:00",
+  "epochs_completed": 30,
+  "best_epoch": 13,
+  "best_validation_loss": 0.0157744828611612,
+  "best_validation_accuracy": 0.994929015636444,
+  "checkpoint_sha256": "ab1aa66857f8d6e1086d9e84fb29dafa73389f377df3f277051aa5366cb55f73",
+  "fit_seconds": 564.4122166279999
+}

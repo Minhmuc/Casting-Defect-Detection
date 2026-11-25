@@ -59,6 +59,124 @@ Nói được 7 câu này là nắm được khung Chương 2:
 6. **(2.4.4)** Đánh giá coi lớp lỗi là lớp quan tâm: TP, FN, FP, TN, rồi accuracy, precision, recall, F1 lớp lỗi và macro F1, ngưỡng cố định 0,5.
 7. **(2.4.5)** Mô hình đề xuất được chọn theo validation loss nhỏ nhất và được ghi lại **trước** khi chạy test; sau đó cả ba checkpoint mới được đánh giá trên cùng 715 ảnh test.
 
+### A2. Dữ liệu – phần thầy hỏi nhiều nhất (ôn kỹ phần này trước)
+
+<!-- Số liệu kiểm ngày 25/11/2026 từ casting_full_3models_01/data_check.json, split_counts.csv, excluded_train_duplicates.csv, Casting.ipynb (cell nạp dữ liệu), và băm lại toàn bộ 7.348 ảnh trong data/casting_data. -->
+
+**Ưu tiên ôn:** phần dữ liệu (A2 này + K5–K19, K63–K64 ở phần B) **kỹ**; phần mô hình chỉ cần nắm mức "nói được ý chính" (xem cuối A2).
+
+#### Con số phải thuộc
+
+| Bước | Lỗi (`def_front`, nhãn 0) | Đạt (`ok_front`, nhãn 1) | Tổng |
+|---|---:|---:|---:|
+| Thư mục train của nguồn | 3.758 | 2.875 | 6.633 |
+| Thư mục test của nguồn | 453 | 262 | 715 |
+| **Tổng ảnh nguồn** | 4.211 | 3.137 | **7.348** |
+| Ảnh train trùng test, bị loại | 0 | 64 | 64 |
+| Train sạch (trước khi tách validation) | 3.758 | 2.811 | 6.569 |
+| → **Train** (85% train sạch) | 3.194 | 2.389 | **5.583** |
+| → **Validation** (15% train sạch) | 564 | 422 | **986** |
+| **Test** (giữ nguyên) | 453 | 262 | **715** |
+| **Tổng ảnh thực dùng** | 4.211 | 3.073 | **7.284** |
+
+- Tỷ lệ ảnh lỗi: train **57,2%**, validation **57,2%** (nhờ stratify), test **63,4%** (giữ theo nguồn).
+- Trên tổng 7.284 ảnh: train ≈ 76,6%, validation ≈ 13,5%, test ≈ 9,8%. "85/15" chỉ là tỷ lệ chia **bên trong** 6.569 ảnh train sạch.
+- Ảnh nguồn: JPEG **300 × 300**, lưu 3 kênh nhưng R = G = B (nội dung xám). Kiểm cả 7.348 ảnh: **0 ảnh hỏng**, tất cả cùng 300 × 300.
+
+#### Dữ liệu đi qua những bước nào (theo notebook)
+
+1. Đọc ảnh bằng Pillow, xoay theo EXIF nếu có, chuyển về ảnh xám một kênh (chế độ `L`).
+2. Tính **SHA-256 trên pixel xám** (kèm kích thước ảnh), **trước** khi resize. Đọc test trước, train sau; ảnh train nào trùng mã với ảnh test thì bị loại khỏi train.
+3. Resize về **256 × 256** (bilinear), lưu thành mảng số nguyên 0–255, kích thước 256 × 256 × 1. Cả 7.284 ảnh nằm trong RAM, khoảng 477 MB.
+4. Tách validation: `train_test_split(test_size=0,15, stratify=nhãn, random_state=42)`.
+5. Khi huấn luyện: `tf.data` xáo trộn toàn bộ train **mỗi epoch**, chia batch 32 (175 bước/epoch). Riêng ResNet-18 và MobileNetV2: resize tiếp về 224 × 224 và lặp kênh xám thành 3 kênh.
+6. Chuẩn hóa nằm **bên trong mô hình**: CNN chia 255; MobileNetV2 đưa về −1…1; ResNet-18 trừ trung bình, chia độ lệch chuẩn của ImageNet. Nhờ vậy demo chỉ cần đưa ảnh 0–255 vào là đúng.
+7. **Không** thêm tăng cường dữ liệu (augmentation) trong lúc huấn luyện, vì bộ nguồn đã có sẵn các biến thể tăng cường.
+
+#### 64 ảnh trùng: đặc điểm cần nói được
+
+- Cả 64 đều là **ảnh đạt**, mỗi cặp **cùng tên tệp** ở `train/ok_front` và `test/ok_front`, pixel giống hệt.
+- Không có ảnh trùng **bên trong** train hay **bên trong** test (đã băm lại cả 7.348 ảnh để kiểm).
+- Nếu không loại: mô hình đã "thấy" 64 ảnh test lúc học → accuracy test cao giả tạo (rò rỉ dữ liệu). 64/262 ≈ 24% số ảnh đạt của test.
+
+#### Câu hỏi dữ liệu (DL1–DL22)
+
+**DL1. Dữ liệu lấy ở đâu? Có công khai không?**
+Bộ Casting Product Image Data for Quality Inspection trên Kaggle, công khai, có trong tài liệu tham khảo [12]. Nhóm dùng thư mục `casting_data` (7.348 ảnh 300 × 300, đã chia sẵn train/test).
+
+**DL2. Ảnh chụp cái gì?**
+Mặt trước cánh bơm đúc, chụp từ trên xuống, sản phẩm nằm giữa ảnh trên nền xám. Mỗi ảnh một sản phẩm.
+
+**DL3. Lỗi gồm những loại nào?**
+Nhãn chỉ có **lỗi / đạt**, không ghi loại lỗi. Nhìn ảnh lỗi thấy bavia, vết mẻ, khe nứt ở mép (Hình 2.1). Vì không có nhãn loại lỗi và vị trí lỗi, bài toán là phân loại nhị phân cả ảnh.
+
+**DL4. Sao nguồn 7.348 ảnh mà chỉ dùng 7.284?**
+Loại 64 ảnh train trùng pixel với ảnh test. 7.348 − 64 = 7.284.
+
+**DL5. Kiểm trùng bằng cách nào? Sao không so tên tệp?**
+Băm SHA-256 trên pixel. Hai ảnh có cùng mã băm thì coi là giống hệt. So tên tệp không đủ: hai tệp khác tên vẫn có thể cùng ảnh, cùng tên cũng có thể khác ảnh. (Trong dữ liệu này 64 cặp trùng tình cờ cùng tên.)
+
+**DL6. Sao băm trên pixel xám, trước resize, mà không băm cả tệp JPEG?**
+Băm cả tệp thì hai tệp cùng ảnh nhưng khác metadata sẽ ra mã khác. Băm pixel thì chỉ so nội dung ảnh. Làm trước resize để kết quả không phụ thuộc phép nội suy.
+
+**DL7. Sao loại bản ở train mà không loại bản ở test?**
+Giữ test nguyên vẹn để đánh giá đúng trên tập test gốc của bộ dữ liệu. Train mất 64 ảnh trên 6.633 (≈ 1%), không đáng kể.
+
+**DL8. Loại trùng xong là hết rò rỉ chưa?**
+Chưa chắc. SHA-256 chỉ bắt ảnh **y hệt**. Bộ nguồn có sẵn ảnh tăng cường (xoay, đổi sáng…) và không có mã ảnh gốc, nên biến thể của cùng một sản phẩm vẫn có thể nằm ở cả train và test. Vì vậy 99,44% có thể lạc quan với ảnh mới (mục 3.5.4). Hướng làm: dùng băm cảm nhận (perceptual hash) hoặc nhóm ảnh theo sản phẩm gốc. Nhóm **chưa làm**.
+
+**DL9. Rò rỉ dữ liệu là gì? Nói một câu.**
+Thông tin của tập test lọt vào lúc huấn luyện, làm điểm test cao hơn thực tế.
+
+**DL10. Có kiểm ảnh hỏng, ảnh sai kích thước không?**
+Có. Kiểm cả 7.348 ảnh: 0 ảnh không đọc được, tất cả 300 × 300 (mục 3.2). Gặp ảnh không đọc được thì chương trình dừng và báo lỗi, không bỏ qua im lặng.
+
+**DL11. Dữ liệu có cân bằng không?**
+Lệch nhẹ: train/validation khoảng 57,2% ảnh lỗi, test 63,4%. Vì lệch nên ngoài accuracy, nhóm dùng precision, recall, F1 lớp lỗi, macro F1 và ma trận nhầm lẫn. Không dùng class weight vì lệch không lớn.
+
+**DL12. Sao test lệch lớp hơn train?**
+Do bộ nguồn chia sẵn như vậy (453 lỗi / 262 đạt). Nhóm giữ nguyên, không tự chọn lại test. Lưu ý thêm: việc loại 64 ảnh đạt ở train làm train lệch thêm một chút (từ 56,7% lên 57,2% ảnh lỗi).
+
+**DL13. Sao không gộp hết rồi chia lại 70/15/15?**
+Nhóm giữ tập test có sẵn của bộ dữ liệu để không tự chọn lại tập đánh giá. Validation được tách từ phần train còn lại. Nhóm chưa thử cách chia khác.
+
+**DL14. Validation để làm gì? Sao không lấy từ test?**
+Validation dùng để chọn checkpoint, giảm tốc độ học (ReduceLROnPlateau) và chọn mô hình đề xuất. Nếu làm những việc đó bằng test thì test không còn khách quan. Test chỉ dùng một lần ở cuối.
+
+**DL15. Stratify là gì? Cho ví dụ.**
+Chia sao cho tỷ lệ lớp ở mỗi phần giống nhau. Train sạch có 57,2% ảnh lỗi → validation 564/986 = 57,2% ảnh lỗi, train 3.194/5.583 = 57,2%.
+
+**DL16. Vì sao validation 15%?**
+Chọn theo thông lệ, nhóm chưa so sánh tỷ lệ khác. 986 ảnh đủ để đánh giá ổn định (mỗi ảnh ≈ 0,1 điểm phần trăm) mà không bớt quá nhiều ảnh huấn luyện.
+
+**DL17. Ảnh có màu không? Sao dùng 1 kênh?**
+Tệp lưu 3 kênh nhưng R = G = B, tức ảnh xám. Dùng 1 kênh giảm 3 lần bộ nhớ, không mất thông tin. Hai backbone cần 3 kênh nên lặp kênh xám thành 3.
+
+**DL18. Có tăng cường dữ liệu không?**
+Không thêm trong lúc huấn luyện. Bộ nguồn **đã có sẵn** biến thể tăng cường. Thêm nữa thì có thể chồng lên; nhóm chưa khảo sát. (Đừng nói "có augmentation".)
+
+**DL19. Vì sao resize 256 × 256?**
+Nhóm chưa khảo sát kích thước khác. Chỉ nói được: nhỏ hơn 300 nên nhẹ hơn, vẫn đủ chi tiết; 256 chia hết cho 8 nên ba lần gộp 2 × 2 ra 32 × 32 gọn. Đây là nhận xét, không phải kết quả thử nghiệm.
+
+**DL20. Chuẩn hóa là gì? Sao mỗi mô hình một kiểu?**
+Đưa giá trị pixel 0–255 về khoảng nhỏ để huấn luyện ổn định. CNN học từ đầu nên chia 255 là đủ. Hai backbone phải dùng **đúng cách chuẩn hóa lúc chúng được huấn luyện trên ImageNet**, nếu không đặc trưng sẽ lệch. Ví dụ pixel 128: CNN → 0,502; MobileNetV2 → 0,004.
+
+**DL21. Nhãn được gán thế nào?**
+Theo tên thư mục: `def_front` → 0 (lỗi), `ok_front` → 1 (đạt). Mô hình xuất pₒₖ = xác suất lớp đạt; pₒₖ ≥ 0,5 là đạt.
+
+**DL22. Thư mục `casting_512x512` (1.300 ảnh) có dùng không? Ảnh nhà máy khác thì sao?**
+Không dùng. Bộ Kaggle có thêm 1.300 ảnh 512 × 512 (781 lỗi, 519 đạt), nhưng nhóm dùng `casting_data` vì nhiều ảnh hơn và đã chia sẵn train/test; chưa thử bản 512. Với ảnh từ nhà máy khác (ánh sáng, góc chụp khác), kết quả hiện tại **chưa đảm bảo**; cần thu thêm ảnh và đánh giá lại.
+
+#### Phần mô hình: chỉ cần nói được ý chính
+
+Nếu bị hỏi mô hình, nắm 3 câu mô tả và 8 câu hỏi dưới đây là đủ:
+
+- **CNN baseline:** 3 khối Conv 3 × 3 + MaxPooling (32, 64, 128 bộ lọc) → GAP → Dense 64 → Dropout 0,3 → Dense 1 sigmoid; học từ đầu 100.993 tham số.
+- **ResNet-18 / MobileNetV2:** dùng trọng số học sẵn trên ImageNet, **đóng băng** phần backbone, chỉ học đầu phân loại mới (32.897 / 82.049 tham số).
+- **Huấn luyện:** Adam, tốc độ học 0,001, BCE, 30 epoch, batch 32; giữ epoch có validation loss thấp nhất; chọn MobileNetV2 trước khi chạy test.
+
+Câu nên đọc: K20 (vì sao chọn hai mạng), K21 (vì sao đóng băng), K23 (tính tham số Conv), K25 (GAP và Flatten), K31 (tính 32.897), K38 (vì sao BCE), K45 (precision và recall), K47 (chọn trước test).
+
 ### B. Đi qua từng mục của Chương 2
 
 #### Mục 2.1. Phát biểu bài toán

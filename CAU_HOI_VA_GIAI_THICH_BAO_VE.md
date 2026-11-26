@@ -1,6 +1,6 @@
-# Câu hỏi và giải thích bảo vệ môn Học sâu
+# Câu hỏi và giải thích bảo vệ đề tài "Kiểm tra lỗi sản phẩm đúc kim loại" (môn Học sâu)
 
-Tài liệu đọc thêm cho [README](README.md). Bám **báo cáo v4** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx)) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Các chỗ "mục", "Bảng", "Hình" dưới đây là số trong báo cáo v4.
+Tài liệu đọc thêm cho [README](README.md). Bám **báo cáo v4 bản in 25/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx), 58 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Các chỗ "mục", "Bảng", "Hình" dưới đây là số trong bản in; bản này đã đánh số lại Hình/Bảng Chương 2–3 so với bản trước.
 
 ## 1. Đọc kết quả huấn luyện ba mô hình (mục 3.3)
 
@@ -74,6 +74,12 @@ Nếu được hỏi chính xác vì sao từng đỉnh xảy ra: trọng số �
 
 [Lịch sử CNN](casting_full_3models_01/history_cnn.csv) · [Lịch sử ResNet-18](casting_full_3models_01/history_resnet18.csv) · [Lịch sử MobileNetV2](casting_full_3models_01/history_mobilenetv2.csv) (cột `epoch` đếm từ 0)
 
+### Đặt ba đường validation loss cạnh nhau thì thấy gì? (Hình 3.4, mục 3.3.5)
+
+> Hình 3.4 vẽ validation loss ba mô hình trên cùng trục, thang logarit. Sau epoch 1, MobileNetV2 0,0923, ResNet-18 0,2464, CNN 0,6838, gần ln 2 ≈ 0,693 là mức của bộ phân loại gán 0,5 cho mọi ảnh. Thứ tự MobileNetV2 < ResNet-18 < CNN giữ ở 28 trên 30 epoch, trừ epoch 14 và 17. Vì vậy việc chọn MobileNetV2 không phụ thuộc một epoch riêng lẻ.
+
+Validation loss thấp hơn train loss ở 26/30 epoch với CNN, nhưng chỉ 11 với ResNet-18 và 4 với MobileNetV2. Ở epoch 30, validation loss MobileNetV2 gấp khoảng 3,9 lần train loss: đầu phân loại khớp train tốt hơn mà validation gần như không giảm thêm.
+
 ### Vì sao validation đôi lúc tốt hơn train?
 
 Train được tính trong lúc trọng số đang thay đổi và Dropout đang bật. Validation dùng trọng số cuối epoch và tắt Dropout (mục 3.3.2). [Keras về cách huấn luyện và đánh giá](https://keras.io/api/models/model_training_apis/)
@@ -100,15 +106,17 @@ Ví dụ trong output: MobileNetV2 có validation accuracy cao nhất ở epoch 
 
 > Nhóm dùng bộ Casting Product Image Data for Quality Inspection trên Kaggle, hai nhãn lỗi và đạt, thư mục `casting_data` có 7.348 ảnh 300 × 300: 6.633 ảnh train và 715 ảnh test. Nhóm tìm thấy 64 ảnh đạt trong train trùng pixel với ảnh test, nên bỏ các bản ở train. Phần train còn lại 6.569 ảnh được chia thành 5.583 ảnh train và 986 ảnh validation. Tập test giữ nguyên 715 ảnh.
 
-| Tập (Bảng 3.1) | Lỗi | Đạt | Tổng | Vai trò (Bảng 2.2) |
+| Tập (Bảng 3.1) | Lỗi | Đạt | Tổng | Vai trò (Bảng 2.3) |
 |---|---:|---:|---:|---|
 | Train | 3.194 | 2.389 | 5.583 | Cập nhật trọng số |
 | Validation | 564 | 422 | 986 | Giảm learning rate, chọn checkpoint và mô hình |
 | Test | 453 | 262 | 715 | Đánh giá cấu hình đã chọn |
 
+Chuỗi xử lý vẽ ở **Hình 2.1**; số ảnh qua từng bước kiểm tra ở **Bảng 2.2** (7.348 nguồn, 0 ảnh hỏng, 64 ảnh đạt trùng bị loại, 6.569 train sạch với 57,21% ảnh lỗi). Loại trùng làm trước khi chia validation, nên validation không chứa ảnh trùng test.
+
 ### Vì sao loại ảnh trùng? Vì sao giữ test gốc? Seed 42 dùng để làm gì?
 
-Nếu cùng một ảnh nằm ở cả train và test, kết quả test cao lên vì mô hình gặp lại ảnh đã học. Nhóm băm SHA-256 trên kích thước và pixel ảnh xám trước resize để tìm bản sao chính xác. So pixel thay vì so tên tệp, vì ảnh cùng tên ở train và test có thể khác nội dung (mục 2.2.2).
+Nếu cùng một ảnh nằm ở cả train và test, kết quả test cao lên vì mô hình gặp lại ảnh đã học. Nhóm băm SHA-256 trên kích thước và pixel ảnh xám trước resize để tìm bản sao chính xác. So pixel thay vì so tên tệp, vì ảnh cùng tên ở train và test có thể khác nội dung: còn 80 cặp như vậy (44 lỗi, 36 đạt), so theo tên sẽ loại nhầm 80 ảnh train (mục 2.2.2).
 
 Nhóm đọc test trước train và loại bản ở phía train, để tập test do nguồn cung cấp giữ nguyên 715 ảnh. Sau xử lý, ba tập không còn ảnh trùng pixel (mục 3.2). Ảnh gần giống do xoay, đổi sáng, hoặc nhiều ảnh của cùng một sản phẩm vẫn chưa xác định được khi thiếu thông tin ảnh gốc (mục 3.5.4).
 
@@ -123,7 +131,7 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 
 ### Em giải thích kiến trúc CNN của nhóm được không?
 
-> CNN nhận ảnh xám, đưa pixel về 0–1. Ba tầng tích chập 32, 64, 128 bộ lọc tìm đặc trưng. Sau mỗi tầng, MaxPooling thu nhỏ bản đồ đặc trưng một nửa. Cuối mạng, Global Average Pooling gom 128 bản đồ thành 128 số, rồi Dense 64, Dropout 0,3 và Dense 1 sigmoid cho điểm lớp đạt. Tổng 100.993 tham số, học toàn bộ từ đầu (Bảng 2.4, Hình 2.2).
+> CNN nhận ảnh xám, đưa pixel về 0–1. Ba tầng tích chập 32, 64, 128 bộ lọc tìm đặc trưng. Sau mỗi tầng, MaxPooling thu nhỏ bản đồ đặc trưng một nửa. Cuối mạng, Global Average Pooling gom 128 bản đồ thành 128 số, rồi Dense 64, Dropout 0,3 và Dense 1 sigmoid cho điểm lớp đạt. Tổng 100.993 tham số, học toàn bộ từ đầu (Bảng 2.5, Hình 2.3).
 
 | Thành phần | Giải thích nhập môn |
 |---|---|
@@ -145,12 +153,12 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 
 > MobileNetV2 có khoảng 2,34 triệu tham số, nhẹ hơn 11,22 triệu của ResNet-18, nhờ tích chập tách biệt theo chiều sâu.
 > Nhưng trước GAP, MobileNetV2 có **1.280 kênh đặc trưng**, ResNet-18 chỉ có **512 kênh**.
-> Dense 64 của MobileNetV2 nhận 1.280 đầu vào: (1.280 + 1) × 64 = 82.048, cộng 65 của Dense cuối thành **82.049**. Với ResNet-18: (512 + 1) × 64 = 32.832, cộng 65 thành **32.897** (Bảng 2.7).
+> Dense 64 của MobileNetV2 nhận 1.280 đầu vào: (1.280 + 1) × 64 = 82.048, cộng 65 của Dense cuối thành **82.049**. Với ResNet-18: (512 + 1) × 64 = 32.832, cộng 65 thành **32.897** (Bảng 2.8).
 
 ### Khối inverted residual của MobileNetV2 khác khối residual của ResNet-18 thế nào?
 
-> **ResNet-18 dùng basic block** (Hình 2.3): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Đường tắt giúp gradient truyền thẳng về tầng trước, giảm gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
-> **MobileNetV2 dùng inverted residual** (Hình 2.5, ví dụ block_7), theo hướng mỏng → dày → mỏng:
+> **ResNet-18 dùng basic block** (Hình 2.4): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Đường tắt giúp gradient truyền thẳng về tầng trước, giảm gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
+> **MobileNetV2 dùng inverted residual** (Hình 2.6, ví dụ block_7), theo hướng mỏng → dày → mỏng:
 > 1. Conv 1 × 1 mở rộng số kênh 6 lần (64 → 384).
 > 2. Depthwise Conv 3 × 3 lọc riêng từng kênh. Cùng với bước 1 × 1, tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
 > 3. Conv 1 × 1 nén về 64 kênh, **không dùng ReLU** (linear bottleneck), để tránh mất thông tin khi nén về ít kênh.
@@ -160,7 +168,7 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 
 ### Ba mô hình có được so sánh trong cùng điều kiện?
 
-> Cả ba dùng chung danh sách ảnh train, validation, test, cùng 30 epoch, batch 32, Adam, ngưỡng 0,5 và cách đánh giá. Khác nhau ở kiến trúc, nguồn khởi tạo (ngẫu nhiên hay ImageNet), độ phân giải (256 hay 224) và phần tham số được học. Kết quả là so sánh ba cấu hình hoàn chỉnh; tác động riêng của từng yếu tố cần thí nghiệm khác để đo (mục 2.3.1, 3.4.3).
+> Cả ba dùng chung danh sách ảnh train, validation, test, cùng 30 epoch, batch 32, Adam, ngưỡng 0,5 và cách đánh giá. Khác nhau ở kiến trúc, nguồn khởi tạo (ngẫu nhiên hay ImageNet), độ phân giải (256 hay 224) và phần tham số được học. Kết quả là so sánh ba cấu hình hoàn chỉnh; tác động riêng của từng yếu tố cần thí nghiệm khác để đo (mục 2.4.1, 3.4.3). Bảng 2.10 liệt kê đủ: nửa trên là yếu tố giữ chung, nửa dưới là yếu tố khác (phần trích đặc trưng, đầu vào, khởi tạo, 128/512/1.280 đặc trưng vào đầu phân loại, 0/11.186.112/2.257.984 tham số cố định).
 
 ## 4. Đọc kết quả test và ma trận nhầm lẫn (mục 3.4)
 
@@ -172,9 +180,23 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 | ResNet-18 | 706 | 98,74% | 99,55% | 98,45% | 99,00% | 98,65% | 7 | 2 |
 | MobileNetV2 | 711 | 99,44% | 99,56% | 99,56% | 99,56% | 99,40% | 2 | 2 |
 
-(Bảng 3.3 và 3.4.)
+(Bảng 3.3 và 3.5.)
 
 > MobileNetV2 dự đoán đúng 711 trên 715 ảnh. Trong 4 ảnh sai, 2 ảnh lỗi bị dự đoán đạt và 2 ảnh đạt bị báo lỗi. So với ResNet-18, MobileNetV2 bỏ sót ít hơn 5 ảnh với cùng số báo nhầm; so với CNN, bỏ sót ít hơn 23 ảnh và báo nhầm ít hơn 10 ảnh.
+
+### Còn lớp đạt thì sao? (Bảng 3.4)
+
+> CNN có precision lớp đạt chỉ 90,91%: 275 ảnh được dự đoán đạt có 25 ảnh lỗi. MobileNetV2 có FN = FP = 2 nhưng F1 đạt 99,24% thấp hơn F1 lỗi 99,56%, vì lớp đạt chỉ 262 ảnh nên mỗi ảnh sai chiếm tỷ lệ lớn hơn. Cả ba mô hình có F1 đạt < F1 lỗi, nên macro F1 thấp hơn F1 lỗi.
+
+### MobileNetV2 hơn ResNet-18 5 ảnh. Đủ để nói tốt hơn không? (mục 3.4.3)
+
+> Chưa đủ. Chỉ 11 ảnh hai mô hình bất đồng: ResNet-18 sai riêng 8, MobileNetV2 sai riêng 3. Nếu hai mô hình ngang nhau, mỗi ảnh rơi về một bên với xác suất 0,5; xác suất lệch đến mức này (tính cả hai phía) khoảng 0,23. So với CNN thì rõ: 35 so với 7 và 36 so với 3, xác suất đều nhỏ hơn 10⁻⁴.
+
+Nếu thầy hỏi **"phép tính này là gì?"**: "Dạ đây là kiểm định McNemar dạng chính xác (kiểm định nhị thức trên các ảnh hai mô hình bất đồng); báo cáo mô tả bằng lời, không nêu tên."
+
+### Chi phí của ba cấu hình thế nào? (Bảng 3.6)
+
+> Thời gian 30 epoch: 300,36 / 990,97 / 557,11 giây; tệp .keras 1,26 / 45,35 / 10,61 MB; ảnh test sai 37 / 9 / 4. ResNet-18 học ít tham số nhất nhưng chậm nhất, khoảng 1,78 lần MobileNetV2, vì backbone 11.186.112 tham số cố định vẫn chạy xuôi mỗi batch. Nhóm chưa đo thời gian dự đoán một ảnh.
 
 ### Precision và recall khác nhau ở câu hỏi nào?
 
@@ -186,7 +208,7 @@ Trong bài này, **lỗi** là lớp nhóm quan tâm (mục 2.4.4). Với Mobile
 
 Công thức (2.5): accuracy và precision; công thức (2.6): recall và F1.
 
-Nếu giảng viên chỉ vào ma trận nhầm lẫn (Hình 3.6), đọc **hàng là nhãn thật, cột là nhãn dự đoán**:
+Nếu giảng viên chỉ vào ma trận nhầm lẫn của MobileNetV2 (Hình 3.7), đọc **hàng là nhãn thật, cột là nhãn dự đoán**:
 
 | Nhãn thật | Dự đoán lỗi | Dự đoán đạt |
 |---|---:|---:|
@@ -203,16 +225,28 @@ Trong kiểm tra chất lượng, cần chú ý 2 ảnh lỗi bị dự đoán �
 
 > **FN** nghiêm trọng hơn: sản phẩm lỗi bị cho qua khâu kiểm tra. **FP** làm sản phẩm đạt bị đưa đi kiểm tra lại, tốn thêm công (mục 3.4.2).
 >
-> Nhóm dùng ngưỡng 0,5, tức chọn lớp có điểm lớn hơn. Báo cáo ghi: nếu chi phí bỏ sót cao hơn báo nhầm, ngưỡng có thể được chọn lại trên tập validation (mục 3.4.3).
+> Nhóm dùng ngưỡng 0,5, tức chọn lớp có điểm lớn hơn. Mục 3.4.4 và Bảng 3.7 cho thấy đánh đổi khi đổi ngưỡng; đây là phân tích bổ sung trên test, không dùng để chọn ngưỡng.
 > - Quy tắc là **p_ok ≥ ngưỡng thì đạt**. Muốn khó công nhận "đạt" hơn thì phải **TĂNG** ngưỡng, không phải hạ. Hạ ngưỡng làm **bỏ sót nhiều hơn**.
 > - Tăng ngưỡng giảm FN, tăng recall lớp lỗi, đổi lại FP tăng.
-> - Ngưỡng phải chọn trên **validation** theo chi phí của nhà máy, rồi mới đánh giá lại trên một tập test riêng. Nhóm chưa làm bước này.
+> - Ngưỡng phải chọn trên **validation** theo chi phí của nhà máy, rồi mới báo FN, FP trên test. Lượt chạy chỉ lưu dự đoán 10 ảnh validation, nên nhóm chưa làm bước này.
 
-Minh họa (tính từ dự đoán test của MobileNetV2, **không có trong báo cáo**, chỉ để thấy xu hướng): ngưỡng 0,5 cho FN 2 / FP 2; 0,6 cho FN 1 / FP 2; 0,9 cho FN 1 / FP 6; phải lên 0,96 mới có FN 0 nhưng FP tăng lên 9, vì ảnh lỗi `cast_def_0_150.jpeg` có p_ok 0,9556.
+Số liệu Bảng 3.7 cần nhớ: tại 0,5 là FN/FP = 25/12 (CNN), 7/2 (ResNet-18), 2/2 (MobileNetV2). MobileNetV2 giữ FN = 1 suốt 0,6–0,95 vì `cast_def_0_150.jpeg` có p_ok 0,9556; tại 0,96 thì FN = 0, FP lên 9. CNN chỉ đạt FN = 0 từ t = 0,96 (trong các ngưỡng của bảng), khi đó báo nhầm 229/262 ≈ 87,4% ảnh đạt. ResNet-18 cần ngưỡng > 0,9878 (p_ok của `cast_def_0_2177.jpeg`); tại 0,99 báo nhầm 36 ảnh.
 
 ### Vì sao ảnh `cast_def_0_150.jpeg` bị đoán đạt với điểm cao?
 
-> Nhóm chưa xác định được. Cả ba mô hình đều đoán đạt (p_ok 0,7087 ở CNN, 0,9799 ở ResNet-18, 0,9556 ở MobileNetV2); đây là ảnh test duy nhất cả ba cùng sai, và nhìn bằng mắt nhóm không thấy vết lỗi rõ. Dữ liệu không có chú giải vị trí lỗi; muốn tìm hiểu thêm cần công cụ giải thích như Grad-CAM, nhóm chưa làm (mục 3.5.1, Bảng 3.5).
+> Nhóm chưa xác định được. Cả ba mô hình đều đoán đạt (p_ok 0,7087 ở CNN, 0,9799 ở ResNet-18, 0,9556 ở MobileNetV2); đây là ảnh test duy nhất cả ba cùng sai, và nhìn bằng mắt nhóm không thấy vết lỗi rõ. Dữ liệu không có chú giải vị trí lỗi; muốn tìm hiểu thêm cần công cụ giải thích như Grad-CAM, nhóm chưa làm (mục 3.5.1, Bảng 3.8).
+
+### Ba mô hình có sai cùng những ảnh không? (Bảng 3.9)
+
+> Gần như không. Chỉ `cast_def_0_150.jpeg` sai ở cả ba; chỉ `cast_def_0_1591.jpeg` sai ở hai mô hình (CNN và ResNet-18). 47 ảnh sai ở ít nhất một mô hình, 45 ảnh chỉ sai ở một mô hình, 668 ảnh đúng ở cả ba. 16 ảnh FP là 16 ảnh khác nhau. Phần lớn ảnh sai gắn với từng mô hình.
+
+### Hình 3.11 (phân bố p_ok) nói gì?
+
+> MobileNetV2 tách hai lớp rõ nhất: 448/453 ảnh lỗi có p_ok < 0,05, 253/262 ảnh đạt có p_ok > 0,95, chỉ 7 ảnh trong khoảng 0,2–0,8. CNN có 76 ảnh trong khoảng đó, 28 ảnh sai. Mọi ảnh có độ tự tin ≥ 0,99 đều đúng, nhưng vẫn có ảnh sai dù độ tự tin ≥ 0,9 (6 / 3 / 1). Điểm chưa hiệu chuẩn nên không đọc là xác suất thật.
+
+### Nhóm ảnh `new__0_*` là gì?
+
+> Chỉ nói số liệu: test có 37 ảnh lỗi tên dạng `new__0_*`, mẫu tên chỉ có trong test. CNN bỏ sót 7/37 (18,9%), so với 18/416 ≈ 4,3% ở các ảnh lỗi còn lại; ResNet-18 và MobileNetV2 không sai ảnh nào trong nhóm. Nhóm không suy đoán nguyên nhân.
 
 ### Kết quả này nói được gì về dùng ngoài thực tế?
 
@@ -226,7 +260,7 @@ Minh họa (tính từ dự đoán test của MobileNetV2, **không có trong b�
 
 Quy ước **lỗi = 0, đạt = 1** là mã nhãn để lưu dữ liệu. Khi tính precision, recall, nhóm vẫn chọn lỗi làm lớp cần theo dõi.
 
-### Kết quả demo trên hai ảnh mẫu (Hình 3.10, 3.11)
+### Kết quả demo trên hai ảnh mẫu (Hình 3.12, 3.13)
 
 | Ảnh | CNN p_ok | ResNet-18 p_ok | MobileNetV2 p_ok | Nhãn |
 |---|---:|---:|---:|---|
@@ -241,7 +275,7 @@ Cùng một ảnh, ba mô hình cho cùng nhãn nhưng mức điểm khác nhau.
 
 ### Kiểm chứng 10 ảnh trên CPU có ý nghĩa gì?
 
-> Nhóm nạp lại tệp mô hình trên CPU và so với dự đoán đã lưu từ Colab (Bảng 3.6). MobileNetV2 được đối chiếu trên 10 ảnh validation; cả ba mô hình được đối chiếu trên 10 ảnh test (5 lỗi, 5 đạt). Cả bốn phép đều trùng 10/10 nhãn; sai lệch điểm lớn nhất là 3,1825 × 10⁻⁶ (ResNet-18), trong dung sai tương đối 10⁻³ và tuyệt đối 10⁻⁴. Phép này cho biết tệp nạp lại cho cùng kết quả, không phải đo độ chính xác.
+> Nhóm nạp lại tệp mô hình trên CPU và so với dự đoán đã lưu từ Colab (Bảng 3.10). MobileNetV2 được đối chiếu trên 10 ảnh validation; cả ba mô hình được đối chiếu trên 10 ảnh test (5 lỗi, 5 đạt). Cả bốn phép đều trùng 10/10 nhãn; sai lệch điểm lớn nhất là 3,1825 × 10⁻⁶ (ResNet-18), trong dung sai tương đối 10⁻³ và tuyệt đối 10⁻⁴. Phép này cho biết tệp nạp lại cho cùng kết quả, không phải đo độ chính xác.
 
 [Output minh họa trong notebook](Casting.ipynb) · [Kiểm chứng MobileNetV2](casting_full_3models_01/demo/verification.json) · [Kiểm chứng ba mô hình](demo/models/comparison_verification.json)
 
@@ -261,6 +295,7 @@ Nếu chỉ có thời gian ôn vài câu, hãy thử nói lại bằng lời c�
 4. Dựa vào đâu để nhận xét quá khớp khi accuracy đã lên 99%?
 5. Vì sao chạy 30 epoch mà dùng epoch 21?
 6. MobileNetV2 đúng bao nhiêu ảnh, bỏ sót bao nhiêu ảnh lỗi?
-7. Muốn bớt bỏ sót thì tăng hay hạ ngưỡng?
+7. Muốn bớt bỏ sót thì tăng hay hạ ngưỡng? Vì sao Bảng 3.7 không dùng để chọn ngưỡng?
+8. Vì sao chênh 5 ảnh giữa MobileNetV2 và ResNet-18 chưa đủ khẳng định?
 
-Bộ 31 câu hỏi đầy đủ kèm câu trả lời ngắn: [README mục 5](README.md#5-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi).
+Bộ 43 câu hỏi đầy đủ kèm câu trả lời ngắn: [README mục 6](README.md#6-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi) (câu 32–43 là nội dung mới của bản in).

@@ -1,6 +1,6 @@
-# Hướng dẫn hiểu và bảo vệ đề tài phân loại lỗi sản phẩm đúc
+# Hướng dẫn hiểu và bảo vệ đề tài "Kiểm tra lỗi sản phẩm đúc kim loại"
 
-Tài liệu đọc thêm cho [README](README.md). Nội dung bám **báo cáo v4** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx), 58 trang) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Tài liệu dẫn theo **số mục, số hình, số bảng, số công thức** của báo cáo, không dẫn số trang.
+Tài liệu đọc thêm cho [README](README.md). Nội dung bám **báo cáo v4 bản in 25/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx): 69 tờ PDF gồm bìa, 10 trang La Mã i–x và 58 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Tài liệu dẫn theo **số mục, số hình, số bảng, số công thức** của bản in, không dẫn số trang (số trang xem [README mục 8.1](README.md#81-báo-cáo-gồm-những-gì)). Bản in đã đánh số lại Hình/Bảng Chương 2–3; dùng đúng số trong tài liệu này.
 
 Các câu nói mẫu dùng để luyện diễn đạt. Khi trình bày, hiểu ý rồi nói lại bằng lời của mình.
 
@@ -38,7 +38,9 @@ Mỗi mô hình được huấn luyện để cực tiểu binary cross-entropy 
 
 ### 2.2. Thu thập và tiền xử lý dữ liệu (mục 2.2)
 
-Ba vai trò của các tập (Bảng 2.2):
+Hình 2.1 (đầu mục 2.2) là sơ đồ xử lý dữ liệu: kiểm tra ảnh → băm SHA-256, loại bản train trùng test → chia train/validation, test giữ nguyên → resize 256 × 256 chung → bước riêng từng mô hình. Loại trùng làm **trước** khi chia validation, nên validation không chứa ảnh trùng test.
+
+Ba vai trò của các tập (Bảng 2.3):
 
 - **Train** cập nhật trọng số.
 - **Validation** dùng cho ReduceLROnPlateau, chọn checkpoint và chọn mô hình đề xuất.
@@ -46,7 +48,9 @@ Ba vai trò của các tập (Bảng 2.2):
 
 Nguồn có 7.348 ảnh JPEG 300 × 300: thư mục train 6.633 ảnh, thư mục test 715 ảnh. Ảnh lưu ba kênh nhưng ba kênh bằng nhau, khi đọc được chuyển về ảnh xám một kênh (mục 2.2.1).
 
-Kiểm trùng (mục 2.2.2): băm SHA-256 trên kích thước và pixel ảnh xám **trước resize**; đọc test trước train để ưu tiên giữ test. Kết quả ở mục 3.2: **64 ảnh đạt** trong train trùng pixel với ảnh test cùng lớp, bản ở train bị loại; không ảnh hỏng, không trùng nào khác. Còn 6.569 ảnh train sạch, tách 15% làm validation, chia phân tầng, seed 42 (mục 2.2.3).
+Kiểm trùng (mục 2.2.2): băm SHA-256 trên kích thước và pixel ảnh xám **trước resize**; đọc test trước train để ưu tiên giữ test. Kết quả ở mục 3.2: **64 ảnh đạt** trong train trùng pixel với ảnh test cùng lớp, bản ở train bị loại; không ảnh hỏng, không trùng nào khác. Còn 6.569 ảnh train sạch, tách 15% làm validation, chia phân tầng, seed 42 (mục 2.2.3). Không so theo tên tệp được: còn 80 cặp cùng tên nhưng khác nội dung (44 lỗi, 36 đạt). Nếu giữ 64 ảnh trùng, gần một phần tư ảnh đạt của test (64/262 ≈ 24,4%) là ảnh mô hình đã học.
+
+Số ảnh qua từng bước (Bảng 2.2): train nguồn 6.633 (56,66% lỗi), test nguồn 715 (63,36%), tổng 7.348, ảnh hỏng 0, ảnh trùng bị loại 64 (toàn ảnh đạt), train sạch 6.569 (57,21%). Một bộ phân loại luôn đoán "lỗi" đã đạt 57,20% trên validation và 63,36% trên test; accuracy phải đọc so với hai mốc này.
 
 | Tập (Bảng 3.1) | Ảnh lỗi | Ảnh đạt | Tổng |
 |---|---:|---:|---:|
@@ -63,7 +67,7 @@ Tỷ lệ ảnh lỗi ở train và validation đều khoảng 57,2%; ở test k
 
 Khi được hỏi về độc lập dữ liệu, trả lời đúng phạm vi đã kiểm tra. Sau xử lý, ba tập không còn ảnh trùng pixel. Bộ nguồn đã có augmentation, nên phép kiểm tra đó chưa bắt được ảnh biến đổi gần giống hoặc ảnh cùng một sản phẩm (mục 3.5.4).
 
-**Đầu vào từng mô hình (mục 2.2.4, Bảng 2.3).** Ảnh xám được resize bilinear bằng Pillow về 256 × 256. CNN nhận trực tiếp và chuẩn hóa `x/255`. Với ResNet-18 và MobileNetV2, ảnh tiếp tục được resize bằng `tf.image.resize` (bilinear, antialias) về 224 × 224 rồi lặp thành ba kênh. ResNet-18 chuẩn hóa `(x/255 − μ)/σ` theo ImageNet; MobileNetV2 chuẩn hóa `x/127,5 − 1`. Chuẩn hóa đặt trong mô hình để lưu cùng tệp `.keras`.
+**Đầu vào từng mô hình (mục 2.2.4, Bảng 2.4).** Ảnh xám được resize bilinear bằng Pillow về 256 × 256. CNN nhận trực tiếp và chuẩn hóa `x/255`. Với ResNet-18 và MobileNetV2, ảnh tiếp tục được resize bằng `tf.image.resize` (bilinear, antialias) về 224 × 224 rồi lặp thành ba kênh. ResNet-18 chuẩn hóa `(x/255 − μ)/σ` theo ImageNet; MobileNetV2 chuẩn hóa `x/127,5 − 1`. Chuẩn hóa đặt trong mô hình để lưu cùng tệp `.keras`.
 
 **Vì sao dùng ảnh xám, resize?**
 
@@ -75,7 +79,7 @@ Nguồn đã có augmentation. Pipeline không thêm augmentation, nên ba cấu
 
 Cả ba mô hình thuộc họ mạng tích chập. "CNN" trong bảng kết quả là tên gọn của mạng nhóm xây làm baseline.
 
-**CNN học từ đầu (mục 2.3.2, Bảng 2.4, Hình 2.2)**
+**CNN học từ đầu (mục 2.3.2, Bảng 2.5, Hình 2.3)**
 
 1. Rescaling đưa pixel từ 0–255 về 0–1.
 2. Ba tầng Conv2D với 32, 64, 128 bộ lọc 3 × 3, stride 1, padding same, ReLU.
@@ -95,7 +99,7 @@ Backbone là phần trích xuất đặc trưng. Hai backbone đã học trên I
 
 Lý do đóng băng (mục 2.3.1): tập train chỉ khoảng 5.600 ảnh, và mục tiêu là đo mức đóng góp của đặc trưng ImageNet với chi phí huấn luyện thấp. Fine-tuning để lại cho thực nghiệm sau.
 
-| Cấu hình (Bảng 2.7) | Tổng tham số | Tham số được huấn luyện |
+| Cấu hình (Bảng 2.8) | Tổng tham số | Tham số được huấn luyện |
 |---|---:|---:|
 | CNN | 100.993 | 100.993 |
 | ResNet-18 | 11.219.009 | 32.897 |
@@ -108,19 +112,19 @@ Lý do đóng băng (mục 2.3.1): tập train chỉ khoảng 5.600 ảnh, và m
 
 **Khối inverted residual của MobileNetV2 khác basic block của ResNet-18 thế nào?**
 
-> ResNet-18 dùng **basic block** (Hình 2.3): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
-> MobileNetV2 dùng **inverted residual** (Hình 2.5, ví dụ block_7): Conv 1 × 1 mở rộng 64 → 384 kênh, depthwise 3 × 3 lọc riêng từng kênh, Conv 1 × 1 chiếu tuyến tính về 64 kênh (không ReLU), rồi cộng với đầu vào. Hẹp ở hai đầu, rộng ở giữa (mỏng → dày → mỏng). Tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
+> ResNet-18 dùng **basic block** (Hình 2.4, kiến trúc ở Hình 2.5): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
+> MobileNetV2 dùng **inverted residual** (Hình 2.6, ví dụ block_7; kiến trúc ở Hình 2.7): Conv 1 × 1 mở rộng 64 → 384 kênh, depthwise 3 × 3 lọc riêng từng kênh, Conv 1 × 1 chiếu tuyến tính về 64 kênh (không ReLU), rồi cộng với đầu vào. Hẹp ở hai đầu, rộng ở giữa (mỏng → dày → mỏng). Tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
 > Kiểu "dày → mỏng → dày" là bottleneck của ResNet-50 trở lên, **không phải** ResNet-18. Đừng nhầm khi trả lời.
 
 **Câu nói mẫu**
 
-> Với CNN, nhóm học toàn bộ trọng số từ đầu. Với hai mô hình học trước, nhóm giữ cố định phần trích xuất đặc trưng và chỉ học đầu phân loại mới. Vì vậy kết quả so sánh phản ánh cả kiến trúc, trọng số học trước và độ phân giải đầu vào của từng cấu hình.
+> Với CNN, nhóm học toàn bộ trọng số từ đầu. Với hai mô hình học trước, nhóm giữ cố định phần trích xuất đặc trưng và chỉ học đầu phân loại mới. Vì vậy kết quả so sánh phản ánh cả kiến trúc, trọng số học trước và độ phân giải đầu vào của từng cấu hình (Bảng 2.10).
 
 Đóng băng giữ nguyên trọng số backbone, còn phép tính đặc trưng vẫn chạy cho mọi ảnh. Đó là lý do ResNet-18 học ít tham số nhất mà thời gian huấn luyện dài nhất (990,97 giây, mục 3.3.3).
 
 ### 2.4. Huấn luyện, đánh giá và lựa chọn (mục 2.4)
 
-Thiết lập chung (Bảng 2.8): 30 epoch, batch 32, Adam với learning rate khởi đầu 0,001, binary cross-entropy, seed 42, ReduceLROnPlateau (hệ số 0,5, patience 3, tối thiểu 10⁻⁶), checkpoint theo validation loss thấp nhất, **tắt early stopping**, TerminateOnNaN, ngưỡng `p_ok ≥ 0,5` → đạt. Không dùng class weight, L1/L2 (mục 2.4.2).
+Thiết lập chung (Bảng 2.9): 30 epoch, batch 32, Adam với learning rate khởi đầu 0,001, binary cross-entropy, seed 42, ReduceLROnPlateau (hệ số 0,5, patience 3, tối thiểu 10⁻⁶), checkpoint theo validation loss thấp nhất, **tắt early stopping**, TerminateOnNaN, ngưỡng `p_ok ≥ 0,5` → đạt. Không dùng class weight, L1/L2 (mục 2.4.2).
 
 - Một epoch là một lượt qua 5.583 ảnh train, gồm ⌈5.583 / 32⌉ = 175 lần cập nhật.
 - Adam điều chỉnh bước riêng cho từng tham số dựa trên trung bình trượt của gradient và bình phương gradient. Giá trị 0,001 là mặc định do tác giả Adam đề xuất.
@@ -128,7 +132,14 @@ Thiết lập chung (Bảng 2.8): 30 epoch, batch 32, Adam với learning rate k
 - ModelCheckpoint lưu trạng thái có validation loss nhỏ nhất; CSVLogger ghi loss và accuracy từng epoch.
 - **Vì sao tắt early stopping** (mục 2.4.3): để lưu đủ 30 epoch cho cả ba cấu hình. Việc giữ checkpoint có validation loss thấp nhất đã đóng vai trò chọn điểm dừng.
 
-**Tiêu chí đánh giá (mục 2.4.4, Bảng 2.9).** Lớp lỗi (nhãn 0) là lớp quan tâm. TP = lỗi nhận đúng, FN = lỗi bị nhận thành đạt (bỏ sót), FP = đạt bị báo lỗi, TN = đạt nhận đúng. Công thức (2.5): accuracy và precision; công thức (2.6): recall và F1. Macro F1 = (F1 lỗi + F1 đạt) / 2.
+**Quy trình và thiết kế so sánh (mục 2.4.1, Hình 2.8, Bảng 2.10).** Hình 2.8: một danh sách chia tập dùng chung (mã băm trùng ở cả ba lượt) → huấn luyện ba cấu hình → chọn mô hình chỉ bằng validation loss → đánh giá test → nạp lại trên CPU, so 10 ảnh test (MobileNetV2 thêm 10 ảnh validation) → demo. Bảng 2.10 chia hai nửa:
+
+- Giữ chung: danh sách ảnh, thiết lập huấn luyện (Bảng 2.9), cách chọn checkpoint, ngưỡng, thước đo, cấu trúc đầu phân loại GAP → Dense 64 → Dropout 0,3 → Dense 1.
+- Khác nhau: phần trích đặc trưng; đầu vào 256 × 256 × 1 hay 224 × 224 × 3; khởi tạo ngẫu nhiên hay ImageNet cố định; số đặc trưng vào đầu phân loại 128 / 512 / 1.280; số tham số cố định 0 / 11.186.112 / 2.257.984.
+
+> Thiết kế này trả lời được cấu hình nào tốt hơn trong cùng điều kiện dữ liệu và huấn luyện. Nó không tách được đóng góp riêng của trọng số ImageNet, kiến trúc hay độ phân giải. Muốn tách phải chạy thêm lượt chỉ đổi một yếu tố.
+
+**Tiêu chí đánh giá (mục 2.4.4, Bảng 2.11).** Lớp lỗi (nhãn 0) là lớp quan tâm. TP = lỗi nhận đúng, FN = lỗi bị nhận thành đạt (bỏ sót), FP = đạt bị báo lỗi, TN = đạt nhận đúng. Công thức (2.5): accuracy và precision; công thức (2.6): recall và F1. Macro F1 = (F1 lỗi + F1 đạt) / 2.
 
 **Vì sao chọn theo validation loss, không theo accuracy? (mục 2.4.5)**
 
@@ -209,6 +220,20 @@ Loss ở epoch 14 tăng khoảng 4 lần, accuracy giảm khoảng 1,22 điểm 
 
 > MobileNetV2 có đỉnh validation ở epoch 14, số ảnh sai tăng từ 6 lên 18 rồi về 6. Sau đó mô hình đạt validation loss thấp nhất ở epoch 21. Từ epoch 21 đến 30, train loss giảm từ 0,0119 xuống 0,0046, còn validation loss không thấp hơn 0,0150 và kết thúc ở 0,0179; validation accuracy giảm từ 99,49% xuống 99,39%. Đây là dấu hiệu quá khớp nhẹ cuối lượt, nên nhóm dùng checkpoint epoch 21 cho test và demo.
 
+### 3.3.5. So sánh ba mô hình (Hình 3.4)
+
+Hình 3.4 đặt validation loss ba mô hình trên cùng trục, thang logarit, dấu sao là checkpoint được chọn.
+
+- Sau epoch 1: MobileNetV2 0,0923, ResNet-18 0,2464, CNN 0,6838 (gần ln 2 ≈ 0,693, mức của bộ phân loại gán 0,5 cho mọi ảnh).
+- Hai mạng học chuyển giao vượt 95% validation accuracy từ epoch 1; CNN đến epoch 21 mới đạt 95%. Chỉ MobileNetV2 vượt 99% (từ epoch 5).
+- Thứ tự MobileNetV2 < ResNet-18 < CNN giữ ở 28/30 epoch; ngoại lệ là epoch 14 và 17. Việc chọn MobileNetV2 không phụ thuộc một epoch.
+- 10 epoch cuối, ảnh validation sai: CNN 41–65, ResNet-18 11–15, MobileNetV2 4–6.
+- Validation loss thấp hơn train loss ở 26/30 epoch với CNN, 11 với ResNet-18, 4 với MobileNetV2. Epoch 30: MobileNetV2 gấp khoảng 3,9 lần train loss, ResNet-18 khoảng 2,0 lần.
+
+**Câu nói mẫu**
+
+> Trên cùng trục, MobileNetV2 thấp nhất ở 28 trên 30 epoch, nên lựa chọn không phụ thuộc một epoch riêng lẻ. CNN bắt đầu gần ln 2 vì phải học cả phần trích đặc trưng; hai mạng học chuyển giao có đặc trưng ImageNet ngay từ đầu.
+
 ## 4. Trả lời vì sao validation có đỉnh nhọn
 
 ### Điều đã xác nhận từ code và output
@@ -256,7 +281,7 @@ Chỉ số trên 715 ảnh test (Bảng 3.3):
 | ResNet-18 | 98,74% | 99,55% | 98,45% | 99,00% | 98,65% |
 | MobileNetV2 | 99,44% | 99,56% | 99,56% | 99,56% | 99,40% |
 
-Bốn ô ma trận nhầm lẫn (Bảng 3.4, Hình 3.4–3.6):
+Bốn ô ma trận nhầm lẫn (Bảng 3.5, Hình 3.5–3.7):
 
 | Cấu hình | TP | FN (bỏ sót) | FP (báo nhầm) | TN | Đúng / 715 |
 |---|---:|---:|---:|---:|---:|
@@ -281,21 +306,47 @@ Hai mẫu số cùng là 453 chỉ vì số bỏ sót và báo nhầm đều b�
 
 CNN có FN (25) gấp hơn hai lần FP (12), nên bỏ sót là loại sai chủ yếu. ResNet-18 còn 7 FN và 2 FP, vì vậy recall lỗi (98,45%) thấp hơn precision (99,55%). Một ảnh test bằng khoảng 0,14 điểm phần trăm; chênh 0,70 điểm giữa MobileNetV2 và ResNet-18 là 5 ảnh.
 
+**Chỉ số theo từng lớp (Bảng 3.4).** CNN có precision lớp đạt 90,91% (275 ảnh dự đoán đạt có 25 ảnh lỗi), recall đạt 95,42%, F1 đạt 93,11%. ResNet-18: 97,38% / 99,24% / 98,30%. MobileNetV2: 99,24% cả ba chỉ số. MobileNetV2 có FN = FP = 2 nhưng F1 đạt thấp hơn F1 lỗi (99,56%) vì lớp đạt chỉ 262 ảnh. Cả ba mô hình có F1 đạt < F1 lỗi nên macro F1 < F1 lỗi.
+
+**Ý nghĩa FN, FP (mục 3.4.2).** FN là sản phẩm lỗi bị cho qua; FP là sản phẩm đạt bị giữ lại kiểm tra hoặc loại oan. CNN bỏ sót 5,52%, báo nhầm 4,58%; MobileNetV2 bỏ sót 0,44%, báo nhầm 0,76%. Giả định dây chuyền 5% lỗi, precision lớp lỗi còn khoảng 87,3% (MobileNetV2) và 52,1% (CNN). Đây là phép tính minh họa, không phải kết quả đo.
+
 **Vì sao quan tâm recall lỗi?**
 
 > Trong kiểm tra chất lượng, bỏ sót làm sản phẩm lỗi bị nhận là đạt. Recall lớp lỗi theo dõi loại sai này. Nhóm cũng báo số báo nhầm vì nó liên quan đến việc loại nhầm sản phẩm đạt.
 
 **Có thể nói MobileNetV2 tốt nhất không?**
 
-> Trong ba cấu hình và lần chia dữ liệu này, MobileNetV2 có validation loss thấp nhất và accuracy test cao nhất, nên kết quả test phù hợp với lựa chọn đặt trước. Kết luận gắn với bộ ảnh cùng nguồn và một seed. Hai mô hình học chuyển giao khác CNN cùng lúc về kiến trúc, độ phân giải và trọng số ImageNet, nên thiết kế hiện tại không tách được đóng góp riêng của từng yếu tố (mục 3.4.3).
+> Trong ba cấu hình và lần chia dữ liệu này, MobileNetV2 có validation loss thấp nhất và accuracy test cao nhất, nên kết quả test phù hợp với lựa chọn đặt trước. Kết luận gắn với bộ ảnh cùng nguồn và một seed. Hai mô hình học chuyển giao khác CNN cùng lúc về kiến trúc, độ phân giải và trọng số ImageNet, nên thiết kế hiện tại không tách được đóng góp riêng của từng yếu tố (mục 3.4.3, Bảng 2.10).
 
-Về chi phí: MobileNetV2 có 2.340.033 tham số, nhỏ hơn khoảng 4,8 lần so với 11.219.009 của ResNet-18, và huấn luyện 557,11 giây so với 990,97 giây. CNN nhanh nhất (300,36 giây). Các thời gian này gồm train và validation trên T4; tốc độ nhận một ảnh trên máy cá nhân chưa được đo.
+**MobileNetV2 hơn ResNet-18 5 ảnh, có đủ khẳng định không? (mục 3.4.3)**
 
-Kết quả gắn với ngưỡng 0,5. Nếu chi phí bỏ sót cao hơn báo nhầm, ngưỡng có thể chọn lại trên validation (mục 3.4.3). Muốn bớt bỏ sót phải **tăng** ngưỡng (vì `p_ok ≥ ngưỡng` mới là đạt), đổi lại báo nhầm tăng.
+> Chưa đủ. Chỉ 11 ảnh hai mô hình bất đồng: ResNet-18 sai riêng 8, MobileNetV2 sai riêng 3. Nếu hai mô hình ngang nhau, xác suất lệch đến mức này (tính cả hai phía) khoảng 0,23. So với CNN thì khác rõ: 35 so với 7 (ResNet-18), 36 so với 3 (MobileNetV2), xác suất đều nhỏ hơn 10⁻⁴.
+
+Nếu thầy hỏi "phép tính này là gì?": "Dạ đây là kiểm định McNemar dạng chính xác (kiểm định nhị thức trên các ảnh hai mô hình bất đồng); báo cáo mô tả bằng lời, không nêu tên."
+
+Kết quả test cũng khớp validation: ảnh sai tại checkpoint 41 / 12 / 5 trên 986 ảnh validation, 37 / 9 / 4 trên 715 ảnh test; BCE trên test 0,1298 / 0,0354 / 0,0128, cùng thứ tự với validation loss.
+
+Về chi phí (Bảng 3.6):
+
+| Cấu hình | Tổng tham số | Tham số học | Thời gian 30 epoch (s) | Tệp .keras (MB) | Ảnh test sai |
+|---|---:|---:|---:|---:|---:|
+| CNN | 100.993 | 100.993 | 300,36 | 1,26 | 37 |
+| ResNet-18 | 11.219.009 | 32.897 | 990,97 | 45,35 | 9 |
+| MobileNetV2 | 2.340.033 | 82.049 | 557,11 | 10,61 | 4 |
+
+ResNet-18 học ít tham số nhất mà chậm nhất, khoảng 1,78 lần MobileNetV2, vì 11.186.112 tham số cố định vẫn chạy xuôi mỗi batch. Dung lượng tệp theo tổng tham số; tệp CNN khoảng 12 byte/tham số vì lưu kèm hai moment của Adam. Các thời gian gồm train và validation trên T4; tốc độ nhận một ảnh chưa được đo.
+
+**Ngưỡng (mục 3.4.4, Bảng 3.7).** Kết quả trên dùng ngưỡng 0,5. Muốn bớt bỏ sót phải **tăng** ngưỡng (vì `p_ok ≥ ngưỡng` mới là đạt), đổi lại báo nhầm tăng. Bảng 3.7 đếm FN/FP của ba mô hình ở ngưỡng 0,1–0,99 trên test. Đây là **phân tích bổ sung để minh họa**, không dùng để chọn ngưỡng.
+
+- MobileNetV2: FN = 1 suốt 0,6–0,95 vì `cast_def_0_150.jpeg` có p_ok 0,9556; tại 0,96 thì FN = 0, FP từ 2 lên 9.
+- CNN: trong các ngưỡng của bảng, chỉ đạt FN = 0 từ t = 0,96, khi đó báo nhầm 229/262 ≈ 87,4% ảnh đạt.
+- ResNet-18: cần ngưỡng > 0,9878 (p_ok của `cast_def_0_2177.jpeg`); tại 0,99 báo nhầm 36 ảnh.
+
+> Ngưỡng đúng phải chọn trên validation theo chi phí FN/FP. Lượt chạy chỉ lưu dự đoán 10 ảnh validation, nên nhóm chưa chọn lại ngưỡng.
 
 ## 6. Giải thích phần ảnh sai và demo ở mục 3.5
 
-### Ảnh dự đoán sai (mục 3.5.1, Bảng 3.5, Hình 3.7–3.9)
+### Ảnh dự đoán sai (mục 3.5.1, Bảng 3.8, 3.9, Hình 3.8–3.11)
 
 CNN sai 37 ảnh, ResNet-18 sai 9, MobileNetV2 sai 4. Bốn ảnh MobileNetV2 sai:
 
@@ -308,7 +359,13 @@ CNN sai 37 ảnh, ResNet-18 sai 9, MobileNetV2 sai 4. Bốn ảnh MobileNetV2 sa
 
 Hai ảnh lỗi bị bỏ sót có mức điểm rất khác nhau: một ảnh điểm đạt cao, một ảnh sát ngưỡng. Ảnh `cast_def_0_150.jpeg` bị cả ba mô hình đoán là đạt (p_ok 0,708656 / 0,979930 / 0,955552), là ảnh test duy nhất cả ba cùng sai; nhìn bằng mắt nhóm không thấy vết lỗi rõ. Dữ liệu không có chú giải vị trí lỗi nên nhóm chưa xác định được nguyên nhân. Điểm sigmoid chưa hiệu chuẩn, chỉ dùng để thấy mô hình nghiêng về phía nào so với ngưỡng.
 
-### Lưu và kiểm tra mô hình (mục 3.5.2, Bảng 3.6)
+**Ảnh sai chung (Bảng 3.9).** CNN và ResNet-18 cùng sai 2 ảnh, CNN và MobileNetV2 cùng sai 1, ResNet-18 và MobileNetV2 cùng sai 1. Chỉ `cast_def_0_150.jpeg` sai ở cả ba. 47 ảnh sai ở ít nhất một mô hình, 45 ảnh chỉ sai ở một mô hình; 668 ảnh đúng ở cả ba. 16 ảnh FP là 16 ảnh khác nhau. `cast_def_0_2177.jpeg` có p_ok 0,9878 ở ResNet-18 nhưng CNN cho 0,0003, MobileNetV2 cho 0,0063. Phần lớn ảnh sai gắn với từng mô hình.
+
+**Nhóm `new__0_*` (chỉ nói số liệu).** Test có 37 ảnh lỗi tên dạng `new__0_*`, mẫu tên chỉ có trong test. CNN bỏ sót 7/37 (18,9%), so với 18/416 ≈ 4,3% ở các ảnh lỗi còn lại; ResNet-18 và MobileNetV2 không sai ảnh nào trong nhóm. Không suy đoán nguyên nhân.
+
+**Phân bố p_ok (Hình 3.11).** Trục tung thang logarit, tam giác là ảnh sai. MobileNetV2: 448/453 ảnh lỗi có p_ok < 0,05, 253/262 ảnh đạt có p_ok > 0,95, chỉ 7 ảnh trong khoảng 0,2–0,8 (ResNet-18: 11; CNN: 76, trong đó 28 ảnh sai). Mọi ảnh có độ tự tin ≥ 0,99 đều đúng (323 / 649 / 686 ảnh), nhưng vẫn có ảnh sai dù độ tự tin ≥ 0,9 (6 / 3 / 1). Vùng trung gian quá ít ảnh nên chưa đánh giá được hiệu chuẩn.
+
+### Lưu và kiểm tra mô hình (mục 3.5.2, Bảng 3.10)
 
 **Lưu mô hình để làm gì?**
 
@@ -325,14 +382,14 @@ Kiểm chứng sau nạp trên CPU:
 
 Mỗi phép đối chiếu trên test dùng 5 ảnh lỗi và 5 ảnh đạt. Dung sai tương đối 10⁻³, tuyệt đối 10⁻⁴. Đây là kiểm tra **tính nhất quán sau nạp lại**, không phải đo độ chính xác; accuracy 99,44% thuộc phép đánh giá 715 ảnh test. Trên Windows, bộ chuyển đổi ảnh của ResNet-18 được dựng lại bằng các tầng Keras theo thứ tự resize, nhân scale, cộng offset đã lưu.
 
-### Demo (mục 3.5.3, Hình 3.10–3.11)
+### Demo (mục 3.5.3, Hình 3.12–3.13)
 
 Ứng dụng Streamlit chạy trên máy cá nhân, cho chọn CNN (epoch 29), ResNet-18 (epoch 29), MobileNetV2 (epoch 21) để dự đoán riêng hoặc so sánh trên cùng ảnh. Tệp của MobileNetV2 trong `demo/models/` tên là `casting_classifier.keras`.
 
 | Ảnh | CNN p_ok | ResNet-18 p_ok | MobileNetV2 p_ok | Nhãn cả ba |
 |---|---:|---:|---:|---|
-| cast_ok_0_45.jpeg (Hình 3.10) | 0,848358 | 0,999593 | 0,998192 | Đạt |
-| cast_def_0_1059.jpeg (Hình 3.11) | 0,000039 | 0,003175 | 0,000013 | Lỗi |
+| cast_ok_0_45.jpeg (Hình 3.12) | 0,848358 | 0,999593 | 0,998192 | Đạt |
+| cast_def_0_1059.jpeg (Hình 3.13) | 0,000039 | 0,003175 | 0,000013 | Lỗi |
 
 Điểm lỗi bằng 1 − p_ok. Giao diện hiện 6 chữ số thập phân; quyết định nhãn dùng giá trị đầy đủ. Một ảnh đạt và một ảnh lỗi trên ba mô hình cho 6 kết quả và 6 bản ghi CSV/JSON. Chạy riêng CNN cho 2 kết quả. Thêm tệp JPG hỏng thì các ảnh hợp lệ vẫn được xử lý.
 
@@ -343,7 +400,7 @@ Mỗi phép đối chiếu trên test dùng 5 ảnh lỗi và 5 ảnh đạt. Du
 3. Mô hình đã lưu tạo `p_ok`, chương trình áp ngưỡng 0,5.
 4. Đọc nhãn, điểm từng mô hình, và phân biệt điểm một ảnh với accuracy toàn tập.
 
-Cách khởi động demo: [README mục 2.4](README.md#24-chạy-demo-streamlit-trên-máy-windows) và [demo/README.md](demo/README.md).
+Cách khởi động demo: [README mục 3.4](README.md#34-chạy-demo-streamlit-trên-máy-windows) và [demo/README.md](demo/README.md).
 
 ### Hạn chế (mục 3.5.4)
 
@@ -351,6 +408,8 @@ Cách khởi động demo: [README mục 2.4](README.md#24-chạy-demo-streamlit
 - Nguồn có augmentation; SHA-256 xử lý 64 bản trùng chính xác, còn biến thể của cùng ảnh hoặc cùng sản phẩm cần cách khác để phát hiện. 99,44% phản ánh phạm vi bộ dữ liệu này.
 - Backbone đóng băng; CNN và độ phân giải được chọn trong một lượt so sánh. Fine-tuning và tìm kiếm có hệ thống là hướng tiếp theo.
 - Thời gian là thời gian huấn luyện một lượt trên T4; chưa đo độ trễ từng ảnh, bộ nhớ.
+- Seed 42 cố định chia tập, khởi tạo, thứ tự xáo trộn, nhưng GPU không chạy tất định; mỗi cấu hình một lượt nên chưa có khoảng dao động.
+- Lịch sử không ghi learning rate; dự đoán validation chỉ lưu 10 ảnh, nên chưa chọn được ngưỡng hay đánh giá hiệu chuẩn trên validation (mục 3.4.4).
 - Đầu ra sigmoid chưa hiệu chuẩn; nhãn cấp toàn ảnh. Ứng dụng là bản minh họa, cần kiểm định thêm trước khi dùng trong sản xuất.
 
 ## 7. Trình tự nói khi bảo vệ
@@ -380,14 +439,18 @@ Chương 1 là kiến thức nền để trả lời câu hỏi. Khi trình bày
 - Từ ma trận `[[451, 2], [2, 260]]`, tính được số đúng, số bỏ sót, số báo nhầm, precision, recall.
 - Phân biệt điểm của một ảnh, accuracy toàn tập và kiểm chứng sau nạp.
 - Nêu được điều nhóm đã đo và điều còn là giả thuyết về nguyên nhân các đỉnh validation.
-- Nói đúng chiều chỉnh ngưỡng: muốn bớt bỏ sót thì **tăng** ngưỡng.
+- Nói đúng chiều chỉnh ngưỡng: muốn bớt bỏ sót thì **tăng** ngưỡng; Bảng 3.7 chỉ minh họa, không dùng để chọn ngưỡng.
+- Chỉ đúng Hình 2.1, Bảng 2.2, Bảng 2.10 khi được hỏi dữ liệu và thiết kế so sánh.
+- Giải thích được vì sao chênh 5 ảnh giữa MobileNetV2 và ResNet-18 chưa đủ khẳng định (11 ảnh bất đồng, 8 và 3, xác suất ≈ 0,23).
+- Đọc được Bảng 3.9 và Hình 3.11: ảnh sai gần như không trùng giữa các mô hình; MobileNetV2 tách hai lớp rõ nhất.
 
 ## 9. Mở output nào để đối chiếu
 
 - [Notebook có output](Casting.ipynb): các lớp mạng, pipeline, callbacks, ảnh minh họa.
 - [Lịch sử CNN](casting_full_3models_01/history_cnn.csv), [ResNet-18](casting_full_3models_01/history_resnet18.csv), [MobileNetV2](casting_full_3models_01/history_mobilenetv2.csv): từng epoch.
 - [Bảng so sánh](casting_full_3models_01/comparison.csv) và [chỉ số MobileNetV2](casting_full_3models_01/metrics_mobilenetv2.json): chỉ số test, ma trận.
-- [Ảnh sai MobileNetV2](casting_full_3models_01/errors_mobilenetv2.csv) và [ResNet-18](casting_full_3models_01/errors_resnet18.csv): Bảng 3.5.
-- [Quyết định chọn mô hình](casting_full_3models_01/selection.json), [kiểm chứng MobileNetV2](casting_full_3models_01/demo/verification.json), [kiểm chứng ba mô hình](demo/models/comparison_verification.json): checkpoint và Bảng 3.6.
+- [Ảnh sai MobileNetV2](casting_full_3models_01/errors_mobilenetv2.csv) và [ResNet-18](casting_full_3models_01/errors_resnet18.csv): Bảng 3.8, 3.9.
+- [Quyết định chọn mô hình](casting_full_3models_01/selection.json), [kiểm chứng MobileNetV2](casting_full_3models_01/demo/verification.json), [kiểm chứng ba mô hình](demo/models/comparison_verification.json): checkpoint và Bảng 3.10.
+- [Dự đoán test CNN](casting_full_3models_01/test_predictions_cnn.csv), [ResNet-18](casting_full_3models_01/test_predictions_resnet18.csv), [MobileNetV2](casting_full_3models_01/test_predictions_mobilenetv2.csv): p_ok từng ảnh, nguồn của Bảng 3.7, 3.9, Hình 3.11 và phép so 11 ảnh bất đồng.
 
 Số ảnh sai theo epoch trong tài liệu này tính bằng 986 × (1 − val_accuracy), làm tròn về số nguyên. Đây là số tổng hợp, không cho biết đó là những ảnh nào.

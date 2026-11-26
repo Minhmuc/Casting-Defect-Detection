@@ -1,5 +1,8 @@
 cần sửa lại sau
-sửa tên chương 3
+
+trình bày phần đã sửa:
+sửa tên chương 3 đúng mẫu
 hạn chế/xóa bỏ khoảng trống
 căn đều lề tài liệu tham khảo
-tên nhiệm vụ trong bảng phân công hơi sơ sài nên mô tả thêm (vd:"TVa NV:huấn luyện mô hình gì") thêm 1-2 dòng
+tên nhiệm vụ trong bảng phân công hơi sơ sài nên mô tả thêm thêm 1-2 dòng
+(vd:"TVa NV:huấn luyện mô hình gì") 

@@ -4,8 +4,8 @@
 Thành viên: Nguyễn Quang Minh, Nông Hữu Thịnh, Vũ Ngọc Quý · GVHD: TS. Ngô Hữu Huy
 
 > README này viết để **một thành viên bất kỳ đọc xong có thể bảo vệ cả dự án**, kể cả phần mình không trực tiếp làm.
-> Báo cáo chính thức là **[bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx)** (bản PDF: [baocaocodong_v4.pdf](bao_cao/baocaocodong_v4.pdf)), **bản in 25/11/2026**: 69 tờ PDF gồm bìa, 10 trang La Mã (i–x) và **58 trang** đánh số Ả Rập. Bản v3 và các bản cũ hơn chỉ để đối chiếu, **không dùng để ôn**.
-> README dẫn theo **số mục, số hình, số bảng** của bản in (ví dụ "mục 2.4.5", "Bảng 3.3"). Số trang ghi chủ yếu ở [mục 8.1](#81-báo-cáo-gồm-những-gì) để lật nhanh khi bảo vệ. Bản in đã đánh số lại Hình 2.x, 3.x và Bảng 2.x, 3.x so với bản trước; đừng dùng số hình, số bảng ghi tay từ bản cũ.
+> Báo cáo chính thức là **[bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx)** (bản PDF: [baocaocodong_v4.pdf](bao_cao/baocaocodong_v4.pdf)), **bản in 27/11/2026** (commit `4eaca0d`): 71 tờ PDF gồm bìa, 10 trang La Mã (i–x) và **60 trang** đánh số Ả Rập, tài liệu tham khảo 17 mục. Bản v3 và các bản cũ hơn chỉ để đối chiếu, **không dùng để ôn**.
+> README dẫn theo **số mục, số hình, số bảng** của bản in (ví dụ "mục 2.4.5", "Bảng 3.3"). Số trang ghi chủ yếu ở [mục 8.1](#81-báo-cáo-gồm-những-gì) để lật nhanh khi bảo vệ. Bản 60 trang thêm ba hình phân tích dữ liệu (Hình 2.3–2.5) nên các hình sau đó của Chương 2 lùi 3 số (CNN là Hình 2.6, quy trình thực nghiệm là Hình 2.11); đừng dùng số hình ghi tay từ bản 58 trang.
 > Mọi con số trong README lấy từ thư mục kết quả chính thức [`casting_full_3models_01/`](casting_full_3models_01/) và khớp với báo cáo v4.
 
 ## Mục lục
@@ -44,7 +44,7 @@ Thành viên: Nguyễn Quang Minh, Nông Hữu Thịnh, Vũ Ngọc Quý · GVHD:
 
 Mục này dành cho buổi KT3: thầy hỏi **Chương 2 "Phương pháp và mô hình"**, hỏi bất kỳ ai. Mục tiêu là **hiểu**, không học thuộc. Mỗi mục báo cáo có ba phần: *Mục này nói gì* → *Hiểu từ gốc* (khái niệm nền, có số của dự án) → *Thầy dễ hỏi* (kèm đáp án ngắn).
 
-> **Lưu ý về số mục.** Trong mục này, "2.1", "2.2.3", "2.4.5"… là **số mục của báo cáo**, không phải số mục của README. Câu hỏi đánh số **K1, K2…** để không lẫn với 43 câu ở [mục 6](#6-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi).
+> **Lưu ý về số mục.** Trong mục này, "2.1", "2.2.3", "2.4.5"… là **số mục của báo cáo**, không phải số mục của README. Câu hỏi đánh số **K1, K2…** để không lẫn với 45 câu ở [mục 6](#6-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi).
 > Số liệu kết quả (accuracy, ma trận nhầm lẫn, epoch được chọn) là **kết quả Chương 3**. Ở đây chỉ dùng làm ví dụ, khi nói phải ghi rõ "kết quả ở Chương 3".
 
 ### A. Chương 2 trong 1 phút
@@ -63,7 +63,7 @@ Nói được 7 câu này là nắm được khung Chương 2:
 
 <!-- Số liệu kiểm ngày 25/11/2026 từ casting_full_3models_01/data_check.json, split_counts.csv, excluded_train_duplicates.csv, Casting.ipynb (cell nạp dữ liệu), và băm lại toàn bộ 7.348 ảnh trong data/casting_data. -->
 
-**Ưu tiên ôn:** phần dữ liệu (A2 này + K5–K19, K63–K64, K68–K70 ở phần B) **kỹ**; phần mô hình chỉ cần nắm mức "nói được ý chính" (xem cuối A2).
+**Ưu tiên ôn:** phần dữ liệu (A2 này, kể cả phần EDA + K5–K19, K63–K64, K68–K70, K73–K75 ở phần B) **kỹ**; phần mô hình chỉ cần nắm mức "nói được ý chính" (xem cuối A2).
 
 #### Con số phải thuộc
 
@@ -104,6 +104,16 @@ Báo cáo vẽ chuỗi này ở **Hình 2.1 "Quy trình xử lý dữ liệu"** 
 - Nếu không loại: mô hình đã "thấy" 64 ảnh test lúc học → accuracy test cao giả tạo (rò rỉ dữ liệu). 64/262 ≈ 24,4% số ảnh đạt của test, 64/715 ≈ 9,0% cả tập test (mục 2.2.2).
 - Loại 64 ảnh chỉ mất 0,96% train nguồn; tỷ lệ ảnh lỗi train tăng từ 56,66% lên 57,21%.
 - **Không thể so theo tên tệp:** giữa train sạch và test còn **80 cặp cùng tên nhưng khác nội dung** (44 cặp lỗi, 36 cặp đạt). So theo tên thì 80 ảnh train hợp lệ này bị loại nhầm.
+
+#### Phân tích khám phá dữ liệu (EDA)
+
+Tính trên **5.583 ảnh train thực dùng**, ảnh 300 × 300, thang xám 0–255. Nguồn: báo cáo mục 2.2.1.
+
+- **Mô tả bộ dữ liệu (theo tác giả [12]):** cánh bơm chìm (*submersible pump impeller*) đúc kim loại, chụp từ trên xuống, ảnh xám, chiếu sáng ổn định. Nguồn liệt kê 7 dạng khuyết tật đúc (rỗ khí, lỗ kim, bavia, co ngót, vật liệu khuôn, kim loại rót, luyện kim) nhưng **nhãn chỉ có lỗi/đạt**. Giấy phép **CC BY-NC-ND 4.0**, nhóm dùng cho học tập. Nguồn có hai phiên bản: 1.300 ảnh 512 × 512 chưa tăng cường và 7.348 ảnh 300 × 300 đã tăng cường; nhóm dùng bản 7.348 ảnh (nhiều hơn ≈ 5,7 lần, có test cố định).
+- **Hình 2.3 – phân bố lớp:** ảnh lỗi chiếm 57,2% ở train và validation, 63,4% ở test. Lớp ít hơn vẫn trên một phần ba (2.389 ảnh đạt trong train) → **lệch nhẹ**, nên dùng thêm chỉ số theo lớp và macro F1, không dùng class weight.
+- **Hình 2.4 – ảnh trung bình hai lớp và hiệu tuyệt đối:** cả hai lớp có cấu trúc đồng tâm (sản phẩm đặt giữa ảnh). Hiệu trung bình 12,67 mức xám, lớn nhất 37,15 ở vòng gần tâm (r = 0,20). Khuyết tật mỗi ảnh một chỗ nên **bị phép lấy trung bình làm mờ** → mô hình phải học đặc trưng cục bộ.
+- **Hình 2.5 – độ sáng và độ tương phản:** ảnh đạt **sáng hơn ảnh lỗi khoảng 10,5 mức xám** (149,82 so với 139,28), nhưng hai phân bố vẫn chồng lấn ở 140–150. Độ tương phản 62,29 so với 58,59, chồng lấn nhiều. Nguồn không giải thích chênh lệch này; nhóm **chưa kiểm chứng** nguyên nhân.
+- **Hai lưu ý rút ra (nói đúng như báo cáo):** (1) lệch lớp nhẹ và khác nhau giữa các tập → báo cáo theo từng lớp + macro F1; (2) mô hình **có thể dựa vào độ sáng** bên cạnh dấu hiệu khuyết tật; đề tài chưa có thực nghiệm tách yếu tố này, nên kết quả Chương 3 được đọc kèm lưu ý đó.
 
 #### Câu hỏi dữ liệu (DL1–DL22)
 
@@ -221,7 +231,7 @@ Các công trình [10, 11] dùng cách chia, phiên bản dữ liệu và cấu 
 
 #### Mục 2.2.1. Nguồn dữ liệu và quy ước nhãn
 
-**Mục này nói gì.** Dữ liệu là bộ *Casting Product Image Data for Quality Inspection* [12], thư mục `casting_data`: 7.348 ảnh JPEG 300 × 300 (train 6.633, test 715). Bảng 2.1 quy ước nhãn 0 = lỗi, 1 = đạt. Bộ nguồn đã có sẵn ảnh tăng cường. Hình 2.1 (đầu mục 2.2) là sơ đồ xử lý dữ liệu; Hình 2.2 là ảnh mẫu hai lớp sau tiền xử lý.
+**Mục này nói gì.** Dữ liệu là bộ *Casting Product Image Data for Quality Inspection* [12], thư mục `casting_data`: 7.348 ảnh JPEG 300 × 300 (train 6.633, test 715). Bảng 2.1 quy ước nhãn 0 = lỗi, 1 = đạt. Bộ nguồn đã có sẵn ảnh tăng cường. Hình 2.1 (đầu mục 2.2) là sơ đồ xử lý dữ liệu; Hình 2.2 là ảnh mẫu hai lớp sau tiền xử lý. Bản 60 trang thêm mô tả bộ dữ liệu (cánh bơm chìm, 7 dạng khuyết tật, giấy phép CC BY-NC-ND 4.0, hai phiên bản) và phần phân tích khám phá dữ liệu với **Hình 2.3–2.5** (xem [EDA ở A2](#phân-tích-khám-phá-dữ-liệu-eda)).
 
 **Hiểu từ gốc.**
 
@@ -237,6 +247,15 @@ Vẫn là lớp lỗi. Mã nhãn 0 hay 1 chỉ là quy ước lưu trữ. Khi t�
 
 **K6. Bộ dữ liệu có cân bằng không?**
 Không hoàn toàn. Thư mục train có 3.758 lỗi / 2.875 đạt, test có 453 lỗi / 262 đạt. Vì lệch lớp nên ngoài accuracy nhóm dùng thêm F1 và macro F1.
+
+**K73. Vì sao dùng bản 7.348 ảnh 300 × 300 mà không dùng bản 1.300 ảnh 512 × 512?**
+Bản 7.348 ảnh nhiều hơn khoảng 5,7 lần và có tập test cố định do nguồn chia sẵn, nên kết quả dễ đối chiếu. Đổi lại, bản này đã được tăng cường từ trước, dẫn đến rủi ro ảnh gần giống giữa train và test (mục 2.2.2, 3.5.4).
+
+**K74. Hình 2.4 (ảnh trung bình) cho thấy điều gì? Có chỉ ra vị trí lỗi không?**
+Không. Hai ảnh trung bình đều đồng tâm vì sản phẩm luôn đặt giữa ảnh. Hiệu giữa chúng là các vòng đồng tâm, phản ánh chênh độ sáng và hình tròn chung của sản phẩm. Khuyết tật mỗi ảnh một vị trí nên bị lấy trung bình làm mờ; muốn nhận ra lỗi, mô hình phải học đặc trưng cục bộ trên từng ảnh.
+
+**K75. Ảnh đạt sáng hơn ảnh lỗi ~10,5 mức xám. Vậy mô hình có "ăn gian" bằng độ sáng không?**
+Có thể, và báo cáo nói thẳng điều này. Hai phân bố độ sáng chồng lấn ở 140–150 nên độ sáng một mình không tách được hai lớp, nhưng mô hình có thể dựa một phần vào nó. Đề tài chưa có thực nghiệm tách riêng yếu tố này (ví dụ chuẩn hóa độ sáng từng ảnh rồi huấn luyện lại, hoặc xem bản đồ chú ý như Grad-CAM), nên đây là một hạn chế và hướng làm tiếp. Không khẳng định nguyên nhân của chênh lệch vì nguồn không giải thích.
 
 **K7. Ảnh có màu không? Sao lại dùng ảnh xám?**
 Ảnh JPEG lưu ba kênh nhưng R = G = B, tức là đã là ảnh xám. Nhóm chuyển về một kênh cho gọn; hai backbone cần ba kênh thì lặp lại kênh xám (mục 2.2.4).
@@ -382,7 +401,7 @@ Công bằng về dữ liệu, thiết lập huấn luyện và cách đánh gi�
 
 #### Mục 2.3.2. Kiến trúc CNN baseline
 
-**Mục này nói gì.** CNN dạng Sequential: 3 khối [Conv2D 3 × 3 + ReLU → MaxPooling 2 × 2], số bộ lọc 32 → 64 → 128; rồi GAP → Dense 64 ReLU → Dropout 0,3 → Dense 1 sigmoid. Bảng 2.5 ghi kích thước và số tham số từng tầng, tổng 100.993, tất cả được học. Hình 2.3 vẽ luồng ảnh qua các tầng. Công thức (2.4) là sigmoid.
+**Mục này nói gì.** CNN dạng Sequential: 3 khối [Conv2D 3 × 3 + ReLU → MaxPooling 2 × 2], số bộ lọc 32 → 64 → 128; rồi GAP → Dense 64 ReLU → Dropout 0,3 → Dense 1 sigmoid. Bảng 2.5 ghi kích thước và số tham số từng tầng, tổng 100.993, tất cả được học. Hình 2.6 vẽ luồng ảnh qua các tầng. Công thức (2.4) là sigmoid.
 
 **Hiểu từ gốc.**
 
@@ -437,7 +456,7 @@ Với hai lớp, hai cách tương đương: softmax hai lớp cho p(đạt) = �
 
 #### Mục 2.3.3. ResNet-18 với backbone cố định
 
-**Mục này nói gì.** ResNet-18 dùng **basic block** có đường nối tắt (Hình 2.4). Nhóm dùng preset `resnet_18_imagenet` của KerasHub và converter chuẩn hóa ImageNet. Hình 2.5 vẽ các nhóm khối và đầu phân loại mới. Backbone đóng băng; chỉ học hai tầng Dense mới: 32.897 trên tổng 11.219.009 tham số (Bảng 2.6).
+**Mục này nói gì.** ResNet-18 dùng **basic block** có đường nối tắt (Hình 2.7). Nhóm dùng preset `resnet_18_imagenet` của KerasHub và converter chuẩn hóa ImageNet. Hình 2.8 vẽ các nhóm khối và đầu phân loại mới. Backbone đóng băng; chỉ học hai tầng Dense mới: 32.897 trên tổng 11.219.009 tham số (Bảng 2.6).
 
 **Hiểu từ gốc.**
 
@@ -470,7 +489,7 @@ Vì ngay sau Conv là BN, mà β của BN đã đóng vai bias. Ví dụ Conv 3 
 
 #### Mục 2.3.4. MobileNetV2 với backbone cố định
 
-**Mục này nói gì.** MobileNetV2 dùng **inverted residual** và **linear bottleneck** (Hình 2.6, ví dụ `block_7`). Nhóm dùng Keras Applications, `weights="imagenet"`, `include_top=False`, `alpha=1.0`. Hình 2.7 vẽ kiến trúc dùng trong đề tài. Backbone đóng băng, chỉ học 82.049 trên 2.340.033 tham số (Bảng 2.7).
+**Mục này nói gì.** MobileNetV2 dùng **inverted residual** và **linear bottleneck** (Hình 2.9, ví dụ `block_7`). Nhóm dùng Keras Applications, `weights="imagenet"`, `include_top=False`, `alpha=1.0`. Hình 2.10 vẽ kiến trúc dùng trong đề tài. Backbone đóng băng, chỉ học 82.049 trên 2.340.033 tham số (Bảng 2.7).
 
 **Hiểu từ gốc.**
 
@@ -505,7 +524,7 @@ Vì đầu Dense mới nhận 1.280 đặc trưng (MobileNetV2) so với 512 (Re
 
 #### Mục 2.4.1. Thiết kế ba cấu hình thực nghiệm
 
-**Mục này nói gì.** Bảng 2.8 so ba cấu hình (khởi tạo, phần được học, tổng tham số, tham số được học). Bảng 2.9 là thiết lập chung: 30 epoch, batch 32, Adam 0,001, BCE, seed 42, ReduceLROnPlateau, checkpoint theo validation loss, tắt dừng sớm, ngưỡng 0,5. Hình 2.8 là quy trình thực nghiệm tổng thể. Bảng 2.10 tách yếu tố giữ chung với yếu tố khác nhau giữa ba cấu hình. Thiết lập được chốt trước khi xem test.
+**Mục này nói gì.** Bảng 2.8 so ba cấu hình (khởi tạo, phần được học, tổng tham số, tham số được học). Bảng 2.9 là thiết lập chung: 30 epoch, batch 32, Adam 0,001, BCE, seed 42, ReduceLROnPlateau, checkpoint theo validation loss, tắt dừng sớm, ngưỡng 0,5. Hình 2.11 là quy trình thực nghiệm tổng thể. Bảng 2.10 tách yếu tố giữ chung với yếu tố khác nhau giữa ba cấu hình. Thiết lập được chốt trước khi xem test.
 
 **Hiểu từ gốc.**
 
@@ -518,7 +537,7 @@ Vì đầu Dense mới nhận 1.280 đặc trưng (MobileNetV2) so với 512 (Re
 - **Epoch** = một lượt qua hết 5.583 ảnh train. **Batch 32** = mỗi lần cập nhật dùng 32 ảnh, nên mỗi epoch có ⌈5.583/32⌉ = 175 lần cập nhật.
 - Train được **xáo trộn** khi tạo batch; validation và test giữ thứ tự cố định để ghép đúng xác suất với đường dẫn ảnh.
 - **Seed 42** cố định phép chia tập (chạy lại ra đúng danh sách cũ), cách khởi tạo trọng số và thứ tự xáo trộn. Trên GPU, nhóm không bật chế độ tính toán tất định, nên chạy lại có thể cho số lệch nhỏ. Vì vậy nhóm đã lưu checkpoint và mã băm để kiểm lại đúng kết quả đã báo cáo.
-- **Hình 2.8 (quy trình thực nghiệm):** một danh sách chia tập dùng chung → huấn luyện ba cấu hình → chọn mô hình chỉ bằng validation loss, ghi `selection.json` → đánh giá cả ba trên test → nạp lại trên CPU, so 10 ảnh test (MobileNetV2 thêm 10 ảnh validation) → đưa vào demo. Mã băm SHA-256 của danh sách chia được ghi trong kết quả mỗi lượt và trùng nhau ở cả ba lượt.
+- **Hình 2.11 (quy trình thực nghiệm):** một danh sách chia tập dùng chung → huấn luyện ba cấu hình → chọn mô hình chỉ bằng validation loss, ghi `selection.json` → đánh giá cả ba trên test → nạp lại trên CPU, so 10 ảnh test (MobileNetV2 thêm 10 ảnh validation) → đưa vào demo. Mã băm SHA-256 của danh sách chia được ghi trong kết quả mỗi lượt và trùng nhau ở cả ba lượt.
 - **Bảng 2.10, nửa trên (giữ chung):** danh sách ảnh train/validation/test (Bảng 2.2, 3.1); thiết lập huấn luyện (Bảng 2.9); cách chọn checkpoint, ngưỡng, thước đo (mục 2.4.3–2.4.5); cấu trúc đầu phân loại GAP → Dense 64 ReLU → Dropout 0,3 → Dense 1 sigmoid.
 - **Bảng 2.10, nửa dưới (khác nhau):**
 
@@ -738,7 +757,7 @@ Theo bảng phân công trong báo cáo (xem thêm [mục 7](#7-ai-trình-bày-p
 | 2.1 Phát biểu bài toán | Minh | Thịnh | (2.1)–(2.3), pₒₖ, ngưỡng 0,5 |
 | 2.2 Dữ liệu (2.2.1–2.2.4) | **Thịnh** | Minh | Hình 2.1, SHA-256, 64 ảnh trùng, stratify, Bảng 2.2, 2.3, 5.583/986/715 |
 | 2.3 Ba mô hình | **Minh** | Quý | Tự tính 100.993, 32.897, 82.049; khối dư; depthwise |
-| 2.4.1–2.4.3, 2.4.5 Huấn luyện, chọn mô hình | **Minh** | Quý | Hình 2.8, Bảng 2.10, BCE, Adam, ReduceLROnPlateau, checkpoint, chọn trước test |
+| 2.4.1–2.4.3, 2.4.5 Huấn luyện, chọn mô hình | **Minh** | Quý | Hình 2.11, Bảng 2.10, BCE, Adam, ReduceLROnPlateau, checkpoint, chọn trước test |
 | 2.4.4 Tiêu chí đánh giá | **Quý** | Minh | TP/FN/FP/TN, precision, recall, F1, macro F1 |
 | Demo | **Quý** | Minh | Chuỗi tiền xử lý trong demo khớp 2.2.4, ngưỡng 0,5 |
 | 2.5 Kết luận chương | Minh hoặc Quý | | Câu K49 |
@@ -751,7 +770,7 @@ Theo bảng phân công trong báo cáo (xem thêm [mục 7](#7-ai-trình-bày-p
 4. **Phân biệt phương pháp và kết quả:** nói "theo mục 2.x" khi là cách làm, "ở Chương 3" khi là con số kết quả.
 5. **Dừng ở chỗ mình chắc**, rồi mời bạn phụ trách bổ sung; đừng đoán tiếp để lấp khoảng trống.
 
-Ôn thêm: [Hiểu dự án trong 15 phút](#4-hiểu-dự-án-trong-15-phút) · [Bảng số liệu chính](#5-bảng-số-liệu-chính) · [43 câu ôn bảo vệ](#6-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi) · [Phép tính tay](#82-phép-tính-tay-có-thể-được-yêu-cầu-viết-lên-bảng).
+Ôn thêm: [Hiểu dự án trong 15 phút](#4-hiểu-dự-án-trong-15-phút) · [Bảng số liệu chính](#5-bảng-số-liệu-chính) · [45 câu ôn bảo vệ](#6-ôn-bảo-vệ-câu-hỏi-hội-đồng-hay-hỏi) · [Phép tính tay](#82-phép-tính-tay-có-thể-được-yêu-cầu-viết-lên-bảng).
 
 ---
 
@@ -899,6 +918,7 @@ Công thức (2.1) trong báo cáo viết gọn: `p = f(P(x); θ)`. Trong đó `
 - Bộ nguồn **đã có sẵn ảnh tăng cường** (xoay, đổi sáng...). Nhóm **không thêm** augmentation (`pipeline_augmentation = false` trong `config.json`).
 - Kiểm tra toàn bộ 7.348 ảnh: **không có ảnh hỏng**.
 - Toàn bộ chuỗi xử lý vẽ ở **Hình 2.1**; số ảnh qua từng bước ở **Bảng 2.2**.
+- Phân tích khám phá dữ liệu (Hình 2.3–2.5): lệch lớp nhẹ; ảnh trung bình đồng tâm, không lộ vị trí lỗi; ảnh đạt sáng hơn ảnh lỗi khoảng 10,5 mức xám nhưng phân bố chồng lấn. Chi tiết ở [A2](#phân-tích-khám-phá-dữ-liệu-eda).
 
 **Kiểm trùng bằng SHA-256.** SHA-256 là hàm băm: hai ảnh giống hệt từng pixel cho cùng một mã. Nhóm băm *kích thước + pixel của ảnh xám, trước khi resize* (mục 2.2.2).
 
@@ -942,7 +962,7 @@ Bước chung cho mọi ảnh: đọc bằng Pillow → xoay đúng chiều theo
 
 ### 4.4. CNN baseline: từng tầng và số tham số
 
-<!-- Nguồn: Bảng 2.5, Hình 2.3, model_summary_cnn.txt, fit_cnn.json (100993/100993) -->
+<!-- Nguồn: Bảng 2.5, Hình 2.6, model_summary_cnn.txt, fit_cnn.json (100993/100993) -->
 
 "Baseline" là mô hình mốc để so sánh. Nhóm tự chọn số tầng, số bộ lọc và đầu phân loại, ghép từ các tầng Keras có sẵn, rồi **học toàn bộ từ khởi tạo ngẫu nhiên**. Đây không phải kiến trúc mới.
 
@@ -974,7 +994,7 @@ Giải thích từng thành phần bằng lời:
 
 ### 4.5. Học chuyển giao: ResNet-18 và MobileNetV2
 
-<!-- Nguồn: mục 2.3.1, 2.3.3, 2.3.4, Bảng 2.6–2.8, Hình 2.4–2.7; fit_resnet18.json, fit_mobilenetv2.json -->
+<!-- Nguồn: mục 2.3.1, 2.3.3, 2.3.4, Bảng 2.6–2.8, Hình 2.7–2.10; fit_resnet18.json, fit_mobilenetv2.json -->
 
 **Học chuyển giao (transfer learning)** là dùng lại một mạng đã học trên tập lớn (ImageNet, khoảng một triệu ảnh nhiều loại vật thể) cho bài toán mới.
 
@@ -989,12 +1009,12 @@ Giải thích từng thành phần bằng lời:
 | | ResNet-18 | MobileNetV2 |
 |---|---|---|
 | Nguồn | KerasHub, preset `resnet_18_imagenet` | Keras Applications, `weights="imagenet"`, `include_top=False`, `alpha=1.0` |
-| Ý tưởng chính | Khối dư (residual) có đường nối tắt: đầu ra = ReLU(F(x) + x) (Hình 2.4) | Khối inverted residual: mở rộng kênh → depthwise 3 × 3 → nén tuyến tính (Hình 2.6) |
+| Ý tưởng chính | Khối dư (residual) có đường nối tắt: đầu ra = ReLU(F(x) + x) (Hình 2.7) | Khối inverted residual: mở rộng kênh → depthwise 3 × 3 → nén tuyến tính (Hình 2.9) |
 | Đặc trưng trước GAP | 7 × 7 × **512** | 7 × 7 × **1.280** |
 | Tổng tham số | 11.219.009 | 2.340.033 |
 | Tham số được học | **32.897** = (512 + 1) × 64 + 65 | **82.049** = (1.280 + 1) × 64 + 65 |
 
-**ResNet-18 (basic block):** hai Conv 3 × 3 giữ nguyên số kênh (ví dụ 64 → 64), kèm Batch Normalization, tạo `F(x)`; cộng với đầu vào `x` qua đường nối tắt rồi ReLU. Đường nối tắt giúp gradient đi thẳng về các tầng trước, giảm hiện tượng gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu (Conv 1 × 1). Bốn nhóm, mỗi nhóm 2 basic block, số kênh 64/128/256/512 (Hình 2.5, Bảng 2.6).
+**ResNet-18 (basic block):** hai Conv 3 × 3 giữ nguyên số kênh (ví dụ 64 → 64), kèm Batch Normalization, tạo `F(x)`; cộng với đầu vào `x` qua đường nối tắt rồi ReLU. Đường nối tắt giúp gradient đi thẳng về các tầng trước, giảm hiện tượng gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu (Conv 1 × 1). Bốn nhóm, mỗi nhóm 2 basic block, số kênh 64/128/256/512 (Hình 2.8, Bảng 2.6).
 
 **MobileNetV2 (inverted residual, ví dụ block_7):** Conv 1 × 1 mở rộng 64 → 384 kênh → depthwise 3 × 3 lọc riêng từng kênh → Conv 1 × 1 chiếu về 64 kênh, **không ReLU** (linear bottleneck) → cộng với đầu vào. Gọi là "ngược" vì mở rộng ở giữa, hẹp ở hai đầu. Tích chập tách biệt (depthwise + 1 × 1) cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần. Hàm kích hoạt là ReLU6 (ReLU chặn trên ở 6).
 
@@ -1282,7 +1302,7 @@ Không thêm. Bộ nguồn đã có sẵn ảnh tăng cường, nên ba mô hìn
 ### B. Mô hình
 
 **7. CNN "tự xây" là tự xây thế nào?**
-Nhóm tự chọn 3 khối Conv (32/64/128 bộ lọc) + MaxPooling, rồi GAP, Dense 64, Dropout 0,3, Dense 1 sigmoid, và học toàn bộ 100.993 tham số từ đầu. Các tầng đều là tầng Keras phổ biến; nhóm không nhận là kiến trúc mới (mục 2.3.2, Bảng 2.5, Hình 2.3).
+Nhóm tự chọn 3 khối Conv (32/64/128 bộ lọc) + MaxPooling, rồi GAP, Dense 64, Dropout 0,3, Dense 1 sigmoid, và học toàn bộ 100.993 tham số từ đầu. Các tầng đều là tầng Keras phổ biến; nhóm không nhận là kiến trúc mới (mục 2.3.2, Bảng 2.5, Hình 2.6).
 
 **8. Tính giúp số tham số tầng Conv đầu và Dense 64.**
 Conv đầu: (3 × 3 × 1 + 1) × 32 = 320. Dense 64: (128 + 1) × 64 = 8.256. Số "+1" là bias.
@@ -1300,7 +1320,7 @@ Lấy phần trích đặc trưng đã học trên ImageNet, giữ nguyên trọ
 Đặc trưng trước GAP của MobileNetV2 có 1.280 kênh, ResNet-18 có 512. Dense 64: (1.280 + 1) × 64 + 65 = 82.049 so với (512 + 1) × 64 + 65 = 32.897.
 
 **13. Inverted residual của MobileNetV2 khác basic block của ResNet-18 ra sao?**
-Basic block của ResNet-18: hai Conv 3 × 3 giữ nguyên số kênh, cộng nối tắt rồi ReLU. Inverted residual: Conv 1 × 1 mở rộng (64 → 384), depthwise 3 × 3, Conv 1 × 1 nén tuyến tính về 64 rồi cộng nối tắt (mỏng → dày → mỏng). Kiểu "dày → mỏng → dày" là bottleneck của ResNet-50 trở lên, **không phải** ResNet-18 (Hình 2.4, 2.6).
+Basic block của ResNet-18: hai Conv 3 × 3 giữ nguyên số kênh, cộng nối tắt rồi ReLU. Inverted residual: Conv 1 × 1 mở rộng (64 → 384), depthwise 3 × 3, Conv 1 × 1 nén tuyến tính về 64 rồi cộng nối tắt (mỏng → dày → mỏng). Kiểu "dày → mỏng → dày" là bottleneck của ResNet-50 trở lên, **không phải** ResNet-18 (Hình 2.7, 2.9).
 
 ### C. Huấn luyện
 
@@ -1369,7 +1389,7 @@ Trả lời theo bảng phân công ở mục 7. Phần cả nhóm tự làm: ki
 
 ### G. Nội dung mới của bản in
 
-Các câu dưới bám phần bổ sung của bản in 25/11/2026. Số liệu là kết quả Chương 3, trừ câu 32–33 (Chương 2).
+Các câu dưới bám phần bổ sung của bản in 25–27/11/2026. Số liệu là kết quả Chương 3, trừ câu 32–33 và 44–45 (Chương 2).
 
 **32. Hình 2.1 và Bảng 2.2 nói gì?**
 Hình 2.1 là sơ đồ xử lý dữ liệu: kiểm tra ảnh → băm SHA-256, loại bản train trùng test → chia train/validation, test giữ nguyên → resize 256 chung → bước riêng từng mô hình. Bảng 2.2 đếm ảnh qua các bước: 7.348 nguồn, 0 ảnh hỏng, 64 ảnh đạt bị loại, 6.569 train sạch (57,21% lỗi). Loại trùng làm trước khi chia validation, nên validation không chứa ảnh trùng test (mục 2.2).
@@ -1407,6 +1427,12 @@ Mỗi mô hình một biểu đồ: phân bố p_ok của ảnh lỗi và ảnh 
 
 **43. Nhóm ảnh `new__0_*` là gì?**
 Chỉ nói số liệu. Test có 37 ảnh lỗi tên dạng `new__0_*`, mẫu tên chỉ có trong test. CNN bỏ sót 7/37 (18,9%), so với 18/416 ≈ 4,3% ở các ảnh lỗi còn lại. ResNet-18 và MobileNetV2 không sai ảnh nào trong nhóm. Nhóm không có thông tin về nguồn gốc nhóm ảnh này nên không suy đoán nguyên nhân.
+
+**44. Phần phân tích khám phá dữ liệu (Hình 2.3–2.5) rút ra được gì?**
+Hai điều. Lệch lớp nhẹ (lỗi 57,2% ở train, 63,4% ở test) nên báo cáo dùng chỉ số theo lớp và macro F1. Ảnh đạt sáng hơn ảnh lỗi khoảng 10,5 mức xám, nên mô hình có thể dựa một phần vào độ sáng; nhóm chưa kiểm chứng, kết quả được đọc kèm lưu ý này.
+
+**45. Tài liệu tham khảo có bao nhiêu mục? Mới thêm gì?**
+17 mục. Bản 27/11 thêm [16] Deng và cộng sự (CVPR 2009) cho bộ ImageNet, dẫn ở mục 1.5.4 và 2.3.1, và [17] tài liệu Streamlit, dẫn ở mục 3.5.3. Các bài báo khác dùng bản đã xuất bản (ResNet CVPR 2016, MobileNetV2 CVPR 2018, Adam ICLR 2015, Guo ICML 2017), không dùng bản arXiv.
 
 Đọc thêm câu hỏi và cách giải thích chi tiết: [CAU_HOI_VA_GIAI_THICH_BAO_VE.md](CAU_HOI_VA_GIAI_THICH_BAO_VE.md) · [HUONG_DAN_BAO_VE.md](HUONG_DAN_BAO_VE.md).
 
@@ -1455,33 +1481,33 @@ Gợi ý chia phần trình bày theo phân công (nhóm tự chốt lại thứ
 
 ### 8.1. Báo cáo gồm những gì
 
-Bản in 25/11/2026: 69 tờ PDF = bìa + 10 trang La Mã (i–x: Lời cảm ơn, Mục lục, Phân công, Danh mục hình vii, Danh mục bảng viii, Viết tắt ix, Mở đầu x) + **58 trang Ả Rập** (Chương 1 từ tr. 1, Chương 2 tr. 20, Chương 3 tr. 38, Kết luận tr. 55, Tài liệu tham khảo tr. 56, Phụ lục tr. 58). Toàn báo cáo có 34 hình và 23 bảng.
+Bản in 27/11/2026: 71 tờ PDF = bìa + 10 trang La Mã (i–x: Lời cảm ơn, Mục lục, Phân công, Danh mục hình vii, Danh mục bảng viii, Viết tắt ix, Mở đầu x) + **60 trang Ả Rập** (Chương 1 từ tr. 1, Chương 2 tr. 20, Chương 3 tr. 40, Kết luận tr. 57, Tài liệu tham khảo tr. 58, Phụ lục tr. 60). Toàn báo cáo có 37 hình và 23 bảng.
 
 | Phần | Nội dung | Hình, bảng, công thức |
 |---|---|---|
 | Phân công nhiệm vụ | 8 nhiệm vụ, phân theo tiến độ và theo thành viên | 2 bảng phân công |
 | Mở đầu | Lý do, mục tiêu, phạm vi, bố cục 3 chương | |
 | **Chương 1. Cơ sở lý thuyết** | 1.1 học máy, học sâu · 1.2 toán nền tảng (tensor, xác suất, entropy, gradient) · 1.3 học từ dữ liệu · 1.4 hàm mục tiêu, tối ưu, khái quát hóa · 1.5 mạng nơ-ron và CNN (1.5.3 tích chập và tầng gộp, 1.5.4 cấu trúc CNN và học chuyển giao) · 1.6 kết luận | Hình 1.1–1.13, Bảng 1.1–1.2, công thức (1.1)–(1.11); (1.11) là công thức kích thước đầu ra Conv |
-| **Chương 2. Phương pháp và mô hình** | 2.1 phát biểu bài toán · 2.2 dữ liệu (2.2.1 nguồn và nhãn, 2.2.2 kiểm trùng, 2.2.3 chia tập, 2.2.4 chuẩn hóa) · 2.3 ba mô hình (2.3.2 CNN, 2.3.3 ResNet-18, 2.3.4 MobileNetV2) · 2.4 huấn luyện (2.4.1 ba cấu hình, 2.4.3 checkpoint, 2.4.4 tiêu chí đánh giá, 2.4.5 chọn mô hình trước test) · 2.5 kết luận | Bảng 2.1 nhãn · **2.2 số ảnh qua các bước** · 2.3 vai trò ba tập · 2.4 đầu vào/chuẩn hóa · 2.5 CNN · 2.6 ResNet-18 · 2.7 MobileNetV2 · 2.8 ba cấu hình · 2.9 thiết lập huấn luyện · **2.10 yếu tố chung/khác** · 2.11 ma trận nhầm lẫn. **Hình 2.1 quy trình xử lý dữ liệu** · 2.2 ảnh mẫu · 2.3 CNN · 2.4 basic block · 2.5 ResNet-18 · 2.6 inverted residual · 2.7 MobileNetV2 · **2.8 quy trình thực nghiệm**. Công thức (2.1) mô hình, (2.2)–(2.3) bài toán tối ưu và BCE, (2.4) sigmoid, (2.5) accuracy và precision, (2.6) recall và F1 |
+| **Chương 2. Phương pháp và mô hình** | 2.1 phát biểu bài toán · 2.2 dữ liệu (2.2.1 nguồn, nhãn và **phân tích khám phá dữ liệu**, 2.2.2 kiểm trùng, 2.2.3 chia tập, 2.2.4 chuẩn hóa) · 2.3 ba mô hình (2.3.2 CNN, 2.3.3 ResNet-18, 2.3.4 MobileNetV2) · 2.4 huấn luyện (2.4.1 ba cấu hình, 2.4.3 checkpoint, 2.4.4 tiêu chí đánh giá, 2.4.5 chọn mô hình trước test) · 2.5 kết luận | Bảng 2.1 nhãn · **2.2 số ảnh qua các bước** · 2.3 vai trò ba tập · 2.4 đầu vào/chuẩn hóa · 2.5 CNN · 2.6 ResNet-18 · 2.7 MobileNetV2 · 2.8 ba cấu hình · 2.9 thiết lập huấn luyện · **2.10 yếu tố chung/khác** · 2.11 ma trận nhầm lẫn. **Hình 2.1 quy trình xử lý dữ liệu** · 2.2 ảnh mẫu · **2.3 phân bố lớp · 2.4 ảnh trung bình hai lớp · 2.5 độ sáng và độ tương phản** · 2.6 CNN · 2.7 basic block · 2.8 ResNet-18 · 2.9 inverted residual · 2.10 MobileNetV2 · **2.11 quy trình thực nghiệm**. Công thức (2.1) mô hình, (2.2)–(2.3) bài toán tối ưu và BCE, (2.4) sigmoid, (2.5) accuracy và precision, (2.6) recall và F1 |
 | **Chương 3. Kết quả thực nghiệm bài toán kiểm tra lỗi sản phẩm đúc kim loại** | 3.1 môi trường · 3.2 kiểm tra và chia dữ liệu · 3.3 kết quả huấn luyện (3.3.1 checkpoint, 3.3.2–3.3.4 từng mô hình, **3.3.5 so sánh ba mô hình**) · 3.4 đánh giá trên test (3.4.1 chỉ số, 3.4.2 ma trận, 3.4.3 so sánh, **3.4.4 ảnh hưởng của ngưỡng**) · 3.5 phân tích và minh họa (3.5.1 ảnh đúng/sai, 3.5.2 lưu và kiểm tra mô hình, 3.5.3 demo, 3.5.4 hạn chế) · 3.6 kết luận | Bảng 3.1 phân bố dữ liệu · 3.2 checkpoint và thời gian · **3.3 accuracy/precision/recall/F1 lớp lỗi** · **3.4 chỉ số theo từng lớp** · **3.5 TP/FN/FP/TN** · **3.6 chi phí** · **3.7 FN/FP theo ngưỡng** · 3.8 bốn ảnh MobileNetV2 sai · **3.9 ảnh sai chung** · 3.10 kiểm chứng sau nạp. Hình 3.1–3.3 đường học · **3.4 validation loss chung trục** · 3.5–3.7 ma trận nhầm lẫn · 3.8–3.10 ảnh đúng/sai · **3.11 phân bố pₒₖ** · 3.12–3.13 demo |
-| Kết luận, Tài liệu tham khảo (15 tài liệu), Phụ lục (link Google Drive mã nguồn) | | |
+| Kết luận, Tài liệu tham khảo (17 tài liệu; [16] ImageNet, [17] Streamlit thêm ngày 27/11), Phụ lục (link Google Drive mã nguồn) | | |
 
 **Lật nhanh khi bảo vệ (số trang in ở chân trang):**
 
 | Cần chỉ | Trang | Cần chỉ | Trang |
 |---|---:|---|---:|
-| Hình 2.1 quy trình xử lý dữ liệu | 22 | Bảng 3.4 chỉ số theo lớp | 43 |
-| Bảng 2.2 số ảnh qua các bước | 25 | Bảng 3.5, Hình 3.5–3.7 ma trận nhầm lẫn | 44 |
-| Bảng 2.5 CNN baseline | 27 | Mục 3.4.3 so sánh, xác suất ≈ 0,23 | 45 |
-| Hình 2.8, Bảng 2.10 | 34 | Bảng 3.6 chi phí; mục 3.4.4 | 46 |
-| Bảng 2.11 ma trận nhầm lẫn | 36 | Bảng 3.7 FN/FP theo ngưỡng | 47 |
-| Bảng 3.1 phân bố dữ liệu | 38 | Bảng 3.8 bốn ảnh MobileNetV2 sai | 49 |
-| Bảng 3.2 checkpoint | 39 | Bảng 3.9, Hình 3.11 | 50 |
-| Mục 3.3.5 | 41 | Bảng 3.10 kiểm chứng sau nạp | 51 |
-| Hình 3.4 validation loss | 42 | Hình 3.12, 3.13 demo | 52, 53 |
-| Bảng 3.3 chỉ số lớp lỗi | 43 | Mục 3.5.4 hạn chế | 53 |
+| Hình 2.1 quy trình xử lý dữ liệu | 22 | Bảng 3.3, 3.4 chỉ số | 45 |
+| Hình 2.3–2.5 phân tích khám phá dữ liệu | 24–25 | Bảng 3.5, Hình 3.5–3.7 ma trận nhầm lẫn | 46 |
+| Bảng 2.2 số ảnh qua các bước | 27 | Mục 3.4.3 so sánh, xác suất ≈ 0,23 | 47 |
+| Bảng 2.5 CNN baseline | 30 | Bảng 3.6 chi phí; mục 3.4.4 | 48 |
+| Hình 2.11 quy trình thực nghiệm | 36 | Bảng 3.7 FN/FP theo ngưỡng | 49 |
+| Bảng 2.10 yếu tố chung/khác | 37 | Bảng 3.8 bốn ảnh MobileNetV2 sai | 51 |
+| Bảng 2.11 ma trận nhầm lẫn | 38 | Bảng 3.9, Hình 3.11 | 52 |
+| Bảng 3.1 phân bố dữ liệu | 40 | Bảng 3.10 kiểm chứng sau nạp | 53 |
+| Bảng 3.2 checkpoint | 41 | Hình 3.12, 3.13 demo | 54, 55 |
+| Mục 3.3.5, Hình 3.4 validation loss | 43–44 | Mục 3.5.4 hạn chế | 55 |
 
-**Số đã đổi so với bản trước (để không chỉ nhầm):** Hình 2.1 → 2.2 (ảnh mẫu), 2.2 → 2.3, 2.3 → 2.4, 2.4 → 2.5, 2.5 → 2.6, 2.6 → 2.7; Bảng 2.2 → 2.3, 2.3 → 2.4, 2.4 → 2.5, 2.5 → 2.6, 2.6 → 2.7, 2.7 → 2.8, 2.8 → 2.9, 2.9 → 2.11; Hình 3.4–3.6 → 3.5–3.7, 3.7–3.9 → 3.8–3.10, 3.10–3.11 → 3.12–3.13; Bảng 3.4 → 3.5, 3.5 → 3.8, 3.6 → 3.10. Mới hoàn toàn: Hình 2.1, 2.8, 3.4, 3.11; Bảng 2.2, 2.10, 3.4, 3.6, 3.7, 3.9; mục 3.3.5, 3.4.4.
+**Số đã đổi so với bản 58 trang (để không chỉ nhầm):** chỉ Chương 2 đổi. Thêm Hình 2.3–2.5 (EDA) nên Hình 2.3 → 2.6 (CNN), 2.4 → 2.7, 2.5 → 2.8, 2.6 → 2.9, 2.7 → 2.10, 2.8 → 2.11 (quy trình thực nghiệm). Số bảng và toàn bộ Hình, Bảng Chương 3 giữ nguyên; số trang từ giữa Chương 2 trở đi lùi 1–2 trang.
 
 ### 8.2. Phép tính tay có thể được yêu cầu viết lên bảng
 
@@ -1558,7 +1584,7 @@ Bảng 3.7 (mục 3.4.4) đếm FN, FP của ba mô hình trên 715 ảnh test t
 
 | Tài liệu | Dùng khi |
 |---|---|
-| [Báo cáo v4 (.docx)](bao_cao/baocaocodong_v4.docx) · [PDF](bao_cao/baocaocodong_v4.pdf) | Bản in 25/11/2026 (58 trang Ả Rập), bản nộp và bản dùng khi bảo vệ |
+| [Báo cáo v4 (.docx)](bao_cao/baocaocodong_v4.docx) · [PDF](bao_cao/baocaocodong_v4.pdf) | Bản in 27/11/2026 (60 trang Ả Rập, TLTK 17 mục), bản nộp và bản dùng khi bảo vệ |
 | [HUONG_DAN_BAO_VE.md](HUONG_DAN_BAO_VE.md) | Đọc thêm: giải thích từng phần Chương 2–3 và trình tự nói |
 | [CAU_HOI_VA_GIAI_THICH_BAO_VE.md](CAU_HOI_VA_GIAI_THICH_BAO_VE.md) | Đọc thêm: câu hỏi theo chủ đề, cách đọc biểu đồ và ma trận |
 | [Casting.ipynb](Casting.ipynb) | Xem mã và output lượt chính thức |
@@ -1574,9 +1600,9 @@ Bảng 3.7 (mục 3.4.4) đếm FN, FP của ba mô hình trên 715 ảnh test t
 
 ### 9.2. Checklist trước buổi bảo vệ
 
-- [ ] Mỗi người đọc mục 1, 4, 5 của README và tự trả lời to 43 câu ở mục 6 (câu 32–43 là nội dung mới của bản in).
+- [ ] Mỗi người đọc mục 1, 4, 5 của README và tự trả lời to 45 câu ở mục 6 (câu 32–45 là nội dung mới của bản in).
 - [ ] Thuộc câu tóm tắt 30 giây và năm con số: 5.583/986/715 · 94,83/98,74/99,44% · MobileNetV2 epoch 21 · 711/715, FN 2, FP 2 · 100.993 / 32.897 / 82.049 tham số được học.
 - [ ] Chạy thử demo trên laptop sẽ mang đi (lần đầu nạp mô hình lâu); để sẵn `cast_ok_0_45.jpeg` và `cast_def_0_1059.jpeg`.
-- [ ] Mở sẵn PDF báo cáo v4; nếu demo lỗi thì chỉ vào Hình 3.12 và 3.13 (tr. 52–53).
+- [ ] Mở sẵn PDF báo cáo v4; nếu demo lỗi thì chỉ vào Hình 3.12 và 3.13 (tr. 54–55).
 - [ ] Mở link Google Drive ở cửa sổ ẩn danh để chắc người khác xem được.
 - [ ] Sạc đầy laptop, có mặt sớm.

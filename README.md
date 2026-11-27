@@ -4,6 +4,7 @@
 Thành viên: Nguyễn Quang Minh, Nông Hữu Thịnh, Vũ Ngọc Quý · GVHD: TS. Ngô Hữu Huy
 
 > README này viết để **một thành viên bất kỳ đọc xong có thể bảo vệ cả dự án**, kể cả phần mình không trực tiếp làm.
+> **Ôn nhanh bằng một tệp:** [TAI_LIEU_BAO_VE.md](TAI_LIEU_BAO_VE.md) (bản in: [TAI_LIEU_BAO_VE.pdf](TAI_LIEU_BAO_VE.pdf), 8 trang A4) gói gọn cả dự án, lý thuyết nền, phần riêng từng người, 34 câu hỏi, bẫy và demo. README này là bản đầy đủ để tra cứu sâu.
 > Báo cáo chính thức là **[bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx)** (bản PDF: [baocaocodong_v4.pdf](bao_cao/baocaocodong_v4.pdf)), **bản in 27/11/2026** (commit `4eaca0d`): 71 tờ PDF gồm bìa, 10 trang La Mã (i–x) và **60 trang** đánh số Ả Rập, tài liệu tham khảo 17 mục. Bản v3 và các bản cũ hơn chỉ để đối chiếu, **không dùng để ôn**.
 > README dẫn theo **số mục, số hình, số bảng** của bản in (ví dụ "mục 2.4.5", "Bảng 3.3"). Số trang ghi chủ yếu ở [mục 8.1](#81-báo-cáo-gồm-những-gì) để lật nhanh khi bảo vệ. Bản 60 trang thêm ba hình phân tích dữ liệu (Hình 2.3–2.5) nên các hình sau đó của Chương 2 lùi 3 số (CNN là Hình 2.6, quy trình thực nghiệm là Hình 2.11); đừng dùng số hình ghi tay từ bản 58 trang.
 > Mọi con số trong README lấy từ thư mục kết quả chính thức [`casting_full_3models_01/`](casting_full_3models_01/) và khớp với báo cáo v4.

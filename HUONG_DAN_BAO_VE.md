@@ -1,6 +1,6 @@
 # Hướng dẫn hiểu và bảo vệ đề tài "Kiểm tra lỗi sản phẩm đúc kim loại"
 
-Tài liệu đọc thêm cho [README](README.md). Nội dung bám **báo cáo v4 bản in 25/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx): 69 tờ PDF gồm bìa, 10 trang La Mã i–x và 58 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Tài liệu dẫn theo **số mục, số hình, số bảng, số công thức** của bản in, không dẫn số trang (số trang xem [README mục 8.1](README.md#81-báo-cáo-gồm-những-gì)). Bản in đã đánh số lại Hình/Bảng Chương 2–3; dùng đúng số trong tài liệu này.
+Tài liệu đọc thêm cho [README](README.md). Nội dung bám **báo cáo v4 bản in 27/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx): 71 tờ PDF gồm bìa, 10 trang La Mã i–x và 60 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Tài liệu dẫn theo **số mục, số hình, số bảng, số công thức** của bản in, không dẫn số trang (số trang xem [README mục 8.1](README.md#81-báo-cáo-gồm-những-gì)). Bản in đã đánh số lại Hình/Bảng Chương 2–3; dùng đúng số trong tài liệu này. Bản 60 trang (27/11/2026) thêm Hình 2.3–2.5 (phân tích khám phá dữ liệu, xem [README A2](README.md#phân-tích-khám-phá-dữ-liệu-eda)) nên các hình sau đó của Chương 2 lùi 3 số; tài liệu tham khảo 17 mục.
 
 Các câu nói mẫu dùng để luyện diễn đạt. Khi trình bày, hiểu ý rồi nói lại bằng lời của mình.
 
@@ -79,7 +79,7 @@ Nguồn đã có augmentation. Pipeline không thêm augmentation, nên ba cấu
 
 Cả ba mô hình thuộc họ mạng tích chập. "CNN" trong bảng kết quả là tên gọn của mạng nhóm xây làm baseline.
 
-**CNN học từ đầu (mục 2.3.2, Bảng 2.5, Hình 2.3)**
+**CNN học từ đầu (mục 2.3.2, Bảng 2.5, Hình 2.6)**
 
 1. Rescaling đưa pixel từ 0–255 về 0–1.
 2. Ba tầng Conv2D với 32, 64, 128 bộ lọc 3 × 3, stride 1, padding same, ReLU.
@@ -112,8 +112,8 @@ Lý do đóng băng (mục 2.3.1): tập train chỉ khoảng 5.600 ảnh, và m
 
 **Khối inverted residual của MobileNetV2 khác basic block của ResNet-18 thế nào?**
 
-> ResNet-18 dùng **basic block** (Hình 2.4, kiến trúc ở Hình 2.5): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
-> MobileNetV2 dùng **inverted residual** (Hình 2.6, ví dụ block_7; kiến trúc ở Hình 2.7): Conv 1 × 1 mở rộng 64 → 384 kênh, depthwise 3 × 3 lọc riêng từng kênh, Conv 1 × 1 chiếu tuyến tính về 64 kênh (không ReLU), rồi cộng với đầu vào. Hẹp ở hai đầu, rộng ở giữa (mỏng → dày → mỏng). Tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
+> ResNet-18 dùng **basic block** (Hình 2.7, kiến trúc ở Hình 2.8): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
+> MobileNetV2 dùng **inverted residual** (Hình 2.9, ví dụ block_7; kiến trúc ở Hình 2.10): Conv 1 × 1 mở rộng 64 → 384 kênh, depthwise 3 × 3 lọc riêng từng kênh, Conv 1 × 1 chiếu tuyến tính về 64 kênh (không ReLU), rồi cộng với đầu vào. Hẹp ở hai đầu, rộng ở giữa (mỏng → dày → mỏng). Tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
 > Kiểu "dày → mỏng → dày" là bottleneck của ResNet-50 trở lên, **không phải** ResNet-18. Đừng nhầm khi trả lời.
 
 **Câu nói mẫu**
@@ -132,7 +132,7 @@ Thiết lập chung (Bảng 2.9): 30 epoch, batch 32, Adam với learning rate k
 - ModelCheckpoint lưu trạng thái có validation loss nhỏ nhất; CSVLogger ghi loss và accuracy từng epoch.
 - **Vì sao tắt early stopping** (mục 2.4.3): để lưu đủ 30 epoch cho cả ba cấu hình. Việc giữ checkpoint có validation loss thấp nhất đã đóng vai trò chọn điểm dừng.
 
-**Quy trình và thiết kế so sánh (mục 2.4.1, Hình 2.8, Bảng 2.10).** Hình 2.8: một danh sách chia tập dùng chung (mã băm trùng ở cả ba lượt) → huấn luyện ba cấu hình → chọn mô hình chỉ bằng validation loss → đánh giá test → nạp lại trên CPU, so 10 ảnh test (MobileNetV2 thêm 10 ảnh validation) → demo. Bảng 2.10 chia hai nửa:
+**Quy trình và thiết kế so sánh (mục 2.4.1, Hình 2.11, Bảng 2.10).** Hình 2.11: một danh sách chia tập dùng chung (mã băm trùng ở cả ba lượt) → huấn luyện ba cấu hình → chọn mô hình chỉ bằng validation loss → đánh giá test → nạp lại trên CPU, so 10 ảnh test (MobileNetV2 thêm 10 ảnh validation) → demo. Bảng 2.10 chia hai nửa:
 
 - Giữ chung: danh sách ảnh, thiết lập huấn luyện (Bảng 2.9), cách chọn checkpoint, ngưỡng, thước đo, cấu trúc đầu phân loại GAP → Dense 64 → Dropout 0,3 → Dense 1.
 - Khác nhau: phần trích đặc trưng; đầu vào 256 × 256 × 1 hay 224 × 224 × 3; khởi tạo ngẫu nhiên hay ImageNet cố định; số đặc trưng vào đầu phân loại 128 / 512 / 1.280; số tham số cố định 0 / 11.186.112 / 2.257.984.

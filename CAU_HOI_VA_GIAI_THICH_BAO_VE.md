@@ -1,6 +1,6 @@
 # Câu hỏi và giải thích bảo vệ đề tài "Kiểm tra lỗi sản phẩm đúc kim loại" (môn Học sâu)
 
-Tài liệu đọc thêm cho [README](README.md). Bám **báo cáo v4 bản in 25/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx), 58 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Các chỗ "mục", "Bảng", "Hình" dưới đây là số trong bản in; bản này đã đánh số lại Hình/Bảng Chương 2–3 so với bản trước.
+Tài liệu đọc thêm cho [README](README.md). Bám **báo cáo v4 bản in 27/11/2026** ([bao_cao/baocaocodong_v4.docx](bao_cao/baocaocodong_v4.docx), 60 trang Ả Rập) và bộ kết quả [`casting_full_3models_01`](casting_full_3models_01/). Các chỗ "mục", "Bảng", "Hình" dưới đây là số trong bản in; bản này đã đánh số lại Hình/Bảng Chương 2–3 so với bản trước. Bản 60 trang (27/11/2026) thêm Hình 2.3–2.5 (phân tích khám phá dữ liệu, xem [README A2](README.md#phân-tích-khám-phá-dữ-liệu-eda)) nên các hình sau đó của Chương 2 lùi 3 số; tài liệu tham khảo 17 mục.
 
 ## 1. Đọc kết quả huấn luyện ba mô hình (mục 3.3)
 
@@ -131,7 +131,7 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 
 ### Em giải thích kiến trúc CNN của nhóm được không?
 
-> CNN nhận ảnh xám, đưa pixel về 0–1. Ba tầng tích chập 32, 64, 128 bộ lọc tìm đặc trưng. Sau mỗi tầng, MaxPooling thu nhỏ bản đồ đặc trưng một nửa. Cuối mạng, Global Average Pooling gom 128 bản đồ thành 128 số, rồi Dense 64, Dropout 0,3 và Dense 1 sigmoid cho điểm lớp đạt. Tổng 100.993 tham số, học toàn bộ từ đầu (Bảng 2.5, Hình 2.3).
+> CNN nhận ảnh xám, đưa pixel về 0–1. Ba tầng tích chập 32, 64, 128 bộ lọc tìm đặc trưng. Sau mỗi tầng, MaxPooling thu nhỏ bản đồ đặc trưng một nửa. Cuối mạng, Global Average Pooling gom 128 bản đồ thành 128 số, rồi Dense 64, Dropout 0,3 và Dense 1 sigmoid cho điểm lớp đạt. Tổng 100.993 tham số, học toàn bộ từ đầu (Bảng 2.5, Hình 2.6).
 
 | Thành phần | Giải thích nhập môn |
 |---|---|
@@ -157,8 +157,8 @@ Seed 42 giúp tái lập cách chia. Chia phân tầng (stratify) giữ tỷ l�
 
 ### Khối inverted residual của MobileNetV2 khác khối residual của ResNet-18 thế nào?
 
-> **ResNet-18 dùng basic block** (Hình 2.4): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Đường tắt giúp gradient truyền thẳng về tầng trước, giảm gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
-> **MobileNetV2 dùng inverted residual** (Hình 2.6, ví dụ block_7), theo hướng mỏng → dày → mỏng:
+> **ResNet-18 dùng basic block** (Hình 2.7): hai Conv 3 × 3 kèm Batch Normalization, **giữ nguyên số kênh** (ví dụ 64 → 64), cộng với đầu vào qua đường nối tắt rồi ReLU: y = ReLU(F(x) + x). Đường tắt giúp gradient truyền thẳng về tầng trước, giảm gradient biến mất. Khi đổi số kênh hoặc độ phân giải, đường tắt dùng phép chiếu.
+> **MobileNetV2 dùng inverted residual** (Hình 2.9, ví dụ block_7), theo hướng mỏng → dày → mỏng:
 > 1. Conv 1 × 1 mở rộng số kênh 6 lần (64 → 384).
 > 2. Depthwise Conv 3 × 3 lọc riêng từng kênh. Cùng với bước 1 × 1, tích chập tách biệt cần ít phép tính hơn Conv 3 × 3 thường khoảng 8–9 lần.
 > 3. Conv 1 × 1 nén về 64 kênh, **không dùng ReLU** (linear bottleneck), để tránh mất thông tin khi nén về ít kênh.
